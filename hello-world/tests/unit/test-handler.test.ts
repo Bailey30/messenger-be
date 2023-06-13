@@ -58,7 +58,7 @@ describe('Unit test for app handler', function () {
         expect(result.statusCode).toEqual(200);
         expect(result.body).toEqual(
             JSON.stringify({
-                message: 'i am using canary deployments',
+                message: 'i am using canary deployments3',
             }),
         );
     });

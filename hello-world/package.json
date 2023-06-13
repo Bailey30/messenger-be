@@ -13,10 +13,11 @@
     "test": "npm run compile && npm run unit"
   },
   "dependencies": {
-    "aws-lambda": "^1.0.7",
     "esbuild": "^0.14.14"
   },
   "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.22.5",
+    "@babel/preset-typescript": "^7.22.5",
     "@types/aws-lambda": "^8.10.92",
     "@types/jest": "^29.2.0",
     "@types/node": "^18.11.4",
