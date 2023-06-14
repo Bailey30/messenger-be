@@ -28,7 +28,7 @@ Resources:
             Target: !Join
                 - "/"
                 - - "integrations"
-                - !Ref ConnectInteg
+                  - !Ref ConnectInteg
     ConnectInteg:
         Type: AWS::ApiGatewayV2::Integration
         Properties:
