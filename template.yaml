@@ -39,8 +39,8 @@ Resources:
     OnConnectFunction:
         Type: AWS::Serverless::Function
         Properties:
-            CodeUri: ./src/lambda/
-            Handler: app.connectHandler
+            CodeUri: ./src/lambda/app
+            Handler: connectHandler
             Runtime: nodejs18.x
             # Events:
             #     Connect:
