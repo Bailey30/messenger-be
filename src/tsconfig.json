@@ -17,6 +17,7 @@
     "**/*.config.ts"
   ],
   "include": [
-    "*.ts"
+    "*.ts",
+    "lambda/*/*"
   ]
 }
