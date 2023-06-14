@@ -1,7 +1,8 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 
 export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
- console.log({event})
+    console.log('EVENT', event);
+    console.info('EVENT\n' + JSON.stringify(event, null, 2));
 
     try {
         return {
