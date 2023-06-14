@@ -11,10 +11,48 @@ Globals:
         Timeout: 3
 
 Resources:
+    WebSocketApiGateway:
+        Type: AWS::ApiGatewayV2::Api
+        Properties:
+            Name: WebSocketApi
+            ProtocolType: WEBSOCKET
+            RouteSelectionExpression: $request.body.action
+
+    ConnectRoute:
+        Type: AWS::ApiGatewayV2::Route
+        Properties:
+            ApiId: !Ref WebSocketApiGateway
+            RouteKey: $connect
+            AuthorizationType: NONE
+            OperationName: ConnectRoute
+            Target: !Join
+                - "/"
+                - - "integrations"
+                - !Ref ConnectInteg
+    ConnectInteg:
+        Type: AWS::ApiGatewayV2::Integration
+        Properties:
+            ApiId: !Ref WebSocketApiGateway
+            IntegrationType: AWS_PROXY
+            IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OnConnectFunction.Arn}/invocations
+
+    OnConnectFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            CodeUri: src/lambda
+            Handler: wsHandler.connectHandler
+            Runtime: nodejs18.x
+            Events:
+                Connect:
+                    Type: Api
+                    Properties:
+                        Method: $connect
+                        Path: $connect
+
     HelloWorldFunction:
         Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
         Properties:
-            CodeUri: hello-world/
+            CodeUri: src/
             Handler: app.lambdaHandler
             Runtime: nodejs18.x
             Architectures:
@@ -63,3 +101,6 @@ Outputs:
     HelloWorldFunctionIamRole:
         Description: Implicit IAM Role created for Hello World function
         Value: !GetAtt HelloWorldFunctionRole.Arn
+    WebSocketApiEndpoint:
+        Description: WebSocket API endpoint URL
+        Value: !Sub "wss://${WebSocketApiGateway}.execute-api.${AWS::Region}.amazonaws.com/"
