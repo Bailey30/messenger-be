@@ -48,6 +48,14 @@ Resources:
             #         Properties:
             #             Method: $connect
             #             Path: $connect
+    OnConnectPermission:
+        Type: AWS::Lambda::Permission
+        DependsOn:
+            - WebSocketApiGateway
+        Properties:
+            Action: lambda:InvokeFunction
+            FunctionName: !Ref OnConnectFunction
+            Principal: apigateway.amazonaws.com
 
     HelloWorldFunction:
         Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
