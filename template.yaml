@@ -11,6 +11,30 @@ Globals:
         Timeout: 3
 
 Resources:
+    UserPool:
+        Type: "AWS::Cognito::UserPool"
+        Properties:
+            UserPoolName: messenger-user-pool
+            AutoVerifiedAttributes:
+                - email
+            UsernameConfiguration:
+                CaseSensitive: true
+            Schema:
+                - Name: email
+                  AttributeDataType: String
+                  Mutable: false
+                  Required: true
+                - Name: name
+                  AttributeDataType: String
+                  Mutable: true
+                  Required: true
+    UserPoolClient:
+        Type: AWS::Cognito::UserPoolClient
+        Properties:
+            UserPoolId: !Ref UserPool
+            ClientName: messenger-user-pool-client
+            GenerateSecret: false
+
     WebSocketApiGateway:
         Type: AWS::ApiGatewayV2::Api
         Properties:
@@ -57,6 +81,8 @@ Resources:
             Action: lambda:InvokeFunction
             FunctionName: !Ref OnConnectFunction
             Principal: apigateway.amazonaws.com
+
+    # // create user function
 
     HelloWorldFunction:
         Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -117,3 +143,9 @@ Outputs:
     OnConnectFunctionArn:
         Description: "OnConnect function ARN"
         Value: !GetAtt OnConnectFunction.Arn
+    UserPoolId:
+        Description: Messenger userpool ID
+        Value: !Ref UserPool
+    UserPoolClientId:
+        Description: Messenegr userpoool client ID
+        Value: !Ref UserPoolClient
