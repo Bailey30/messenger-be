@@ -11,6 +11,7 @@ Globals:
         Timeout: 3
 
 Resources:
+    # userpool
     UserPool:
         Type: "AWS::Cognito::UserPool"
         Properties:
@@ -28,6 +29,8 @@ Resources:
                   AttributeDataType: String
                   Mutable: true
                   Required: true
+            LambdaConfig:
+                PostConfirmation: !GetAtt PostConfirmationFunction.Arn
     UserPoolClient:
         Type: AWS::Cognito::UserPoolClient
         Properties:
@@ -35,6 +38,7 @@ Resources:
             ClientName: messenger-user-pool-client
             GenerateSecret: false
 
+    #  websocket
     WebSocketApiGateway:
         Type: AWS::ApiGatewayV2::Api
         Properties:
@@ -66,13 +70,8 @@ Resources:
             CodeUri: src/lambda/onConnect
             Handler: app.connectHandler
             Runtime: nodejs18.x
-            # Events:
-            #     Connect:
-            #         Type: Api
-            #         Properties:
-            #             Method: $connect
+        Policies:
 
-            #             Path: $connect
     OnConnectPermission:
         Type: AWS::Lambda::Permission
         DependsOn:
@@ -80,6 +79,21 @@ Resources:
         Properties:
             Action: lambda:InvokeFunction
             FunctionName: !Ref OnConnectFunction
+            Principal: apigateway.amazonaws.com
+
+    PostConfirmationFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            CodeUri: path/to/code
+            Handler: index.handler
+            Runtime: nodejs14.x
+    PostConfirmationPermissions:
+        Type: AWS::Lambda::Permission
+        DependsOn:
+            - ServerlessRestApi
+        Properties:
+            Action: lambda:InvokeFunction
+            FunctionName: !Ref PostConfirmationFunction
             Principal: apigateway.amazonaws.com
 
     # // create user function
@@ -109,6 +123,48 @@ Resources:
                 Sourcemap: true
                 EntryPoints:
                     - app.ts
+
+    UsersTable:
+        Type: AWS::DynamoDB::Table
+        Properties:
+            AttributeDefinitions:
+                - AttributeName: cognitoid
+                  AttributeType: S
+            KeySchema:
+                - AttributeName: cognitoid
+                  KeyType: HASH
+            BillingMode: PAY_PER_REQUEST
+    ConnectionsTable:
+        Type: AWS::DynamoDB::Table
+        Properties:
+            AttributeDefinitions:
+                - AttributeName: cognitoid
+                  AttributeType: S
+            KeySchema:
+                - AttributeName: cognitoid
+                  KeyType: HASH
+            BillingMode: PAY_PER_REQUEST
+
+    FunctionRole:
+        Type: AWS::IAM::Role
+        Properties:
+            RoleName: FunctionRole
+            AssumeRolePolicyDocument:
+                Version: 2012-10-17
+                Statement:
+                    - Effect: Allow
+                      Principal:
+                          Service: lambda.amazonaws.com
+                      Action: sts:AssumeRole
+            Policies:
+                - PolicyName: DynamoDBAccess
+                  PolicyDocument:
+                      Version: 2012-10-17
+                      Statement:
+                          - Effect: Allow
+                            Action:
+                                - dynamodb:PutItem
+                            Resource: "*"
 
     ApplicationResourceGroup:
         Type: AWS::ResourceGroups::Group
@@ -147,5 +203,5 @@ Outputs:
         Description: Messenger userpool ID
         Value: !Ref UserPool
     UserPoolClientId:
-        Description: Messenegr userpoool client ID
+        Description: Messenger userpool client ID
         Value: !Ref UserPoolClient
