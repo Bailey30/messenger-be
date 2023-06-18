@@ -197,7 +197,7 @@ jobs:
               run: |
                   sam deploy --stack-name ${TESTING_STACK_NAME} \
                     --template packaged-testing.yaml \
-                    --capabilities CAPABILITY_IAM \
+                    --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
                     --region ${TESTING_REGION} \
                     --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
                     --no-fail-on-empty-changeset \
