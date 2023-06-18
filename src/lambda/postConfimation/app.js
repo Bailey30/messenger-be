@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.connectHandler = void 0;
-const connectHandler = async (event) => {
+exports.postConfirmationHandler = void 0;
+const postConfirmationHandler = async (event) => {
     console.log('EVENT', event);
     console.info('EVENT\n' + JSON.stringify(event, null, 2));
     try {
@@ -22,4 +22,4 @@ const connectHandler = async (event) => {
         };
     }
 };
-exports.connectHandler = connectHandler;
+exports.postConfirmationHandler = postConfirmationHandler;
