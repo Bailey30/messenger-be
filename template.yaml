@@ -70,7 +70,6 @@ Resources:
             CodeUri: src/lambda/onConnect
             Handler: app.connectHandler
             Runtime: nodejs18.x
-        Policies:
 
     OnConnectPermission:
         Type: AWS::Lambda::Permission
@@ -84,9 +83,10 @@ Resources:
     PostConfirmationFunction:
         Type: AWS::Serverless::Function
         Properties:
-            CodeUri: path/to/code
-            Handler: index.handler
-            Runtime: nodejs14.x
+            CodeUri: src/lambda/postConfirmation
+            Handler: app.postConfirmationHandler
+            Runtime: nodejs18.x
+
     PostConfirmationPermissions:
         Type: AWS::Lambda::Permission
         DependsOn:
