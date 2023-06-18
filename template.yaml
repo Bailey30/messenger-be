@@ -205,3 +205,6 @@ Outputs:
     UserPoolClientId:
         Description: Messenger userpool client ID
         Value: !Ref UserPoolClient
+    PostConfirmationFunction:
+        Description: Function that runs after the confirmation step of cognito sign up
+        Value: !Ref PostConfirmationFunction
