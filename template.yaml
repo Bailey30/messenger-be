@@ -86,6 +86,7 @@ Resources:
             CodeUri: src/lambda/postConfirmation
             Handler: app.postConfirmationHandler
             Runtime: nodejs18.x
+            Role: !GetAtt FunctionRole.Arn
 
     PostConfirmationPermissions:
         Type: AWS::Lambda::Permission
