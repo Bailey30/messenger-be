@@ -1,8 +1,8 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 
-export const postConfirmationHandler = async (event: APIGatewayProxyEvent, context: any, callback: any) => {
+export const postConfirmationHandler = async (event: any, context: any, callback: any) => {
     console.log('EVENT', event);
-    console.info('EVENT\n' + JSON.stringify(event, null, 2));
+    console.info('EVENT info\n' + JSON.stringify(event, null, 2));
 
-    callback(null, event);
+    return event;
 };
