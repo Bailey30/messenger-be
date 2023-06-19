@@ -164,6 +164,9 @@ Resources:
                           - Effect: Allow
                             Action:
                                 - dynamodb:PutItem
+                                - logs:CreateLogGroup
+                                - logs:CreateLogStream
+                                - logs:PutLogEvents
                             Resource: "*"
 
     ApplicationResourceGroup:
