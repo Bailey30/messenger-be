@@ -95,7 +95,7 @@ Resources:
         Properties:
             Action: lambda:InvokeFunction
             FunctionName: !Ref PostConfirmationFunction
-            Principal: apigateway.amazonaws.com
+            Principal: cognito-idp.amazonaws.com
 
     # // create user function
 
