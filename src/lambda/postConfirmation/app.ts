@@ -26,10 +26,10 @@ export const postConfirmationHandler = async (event: any, context: any, callback
     try {
         await dynamo.send(new PutCommand(params));
 
-        callback(null, {
-            statusCode: 201,
-            body: JSON.stringify(event.body),
-        });
+        // callback(null, {
+        //     statusCode: 201,
+        //     body: JSON.stringify(event.body),
+        // });
     } catch (err: any) {
         console.error(`Error adding item to table: ${err}`);
         callback(null, {
