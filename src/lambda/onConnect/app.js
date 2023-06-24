@@ -11,7 +11,7 @@ const connectHandler = async (event) => {
     const params = {
         TableName: process.env.CONNECTIONS_TABLE_NAME,
         Item: {
-            cognitoid: 1,
+            cognitoid: '1',
             connectionId: event.requestContext.connectionId,
         },
         ConditionExpression: 'attribute_not_exists(cognitoid)',
