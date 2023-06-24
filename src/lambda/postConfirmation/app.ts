@@ -17,7 +17,7 @@ export const postConfirmationHandler = async (event: any, context: any, callback
         TableName: process.env.USERS_TABLE_NAME,
         Item: {
             cognitoid: event.request.userAttributes.sub,
-            username: event.request.userAttributes.username,
+            username: event.request.userAttributes.name,
             email: event.request.userAttributes.email,
         },
         ConditionExpression: 'attribute_not_exists(cognitoid)',
