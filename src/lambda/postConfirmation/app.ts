@@ -4,7 +4,7 @@ const AWS = require('aws-sdk');
 
 const dynamodb = new AWS.DynamoDB.DocumentClient({
     apiVersion: '2012-08-10',
-    region: 'ue-west-2',
+    region: 'eu-west-2',
     httpOptions: {
         timeout: 5000,
     },
@@ -30,8 +30,17 @@ export const postConfirmationHandler = async (event: any, context: any, callback
 
     try {
         await dynamodb.put(params).promise();
-    } catch (err) {
+
+        callback(null, {
+            statusCode: 201,
+            body: JSON.stringify(event.body),
+        });
+    } catch (err: any) {
         console.error(`Error adding item to table: ${err}`);
+        callback(null, {
+            statusCode: 500,
+            body: JSON.stringify(err.message),
+        });
         throw new Error(`Error adding item to table: ${err}`);
     }
 
