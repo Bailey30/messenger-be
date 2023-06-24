@@ -89,7 +89,7 @@ Resources:
             Role: !GetAtt FunctionRole.Arn
             Environment:
                 Variables:
-                    USER_TABLE_NAME: !Ref UsersTable
+                    USERS_TABLE_NAME: !Ref UsersTable
 
     PostConfirmationPermissions:
         Type: AWS::Lambda::Permission
