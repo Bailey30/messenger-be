@@ -11,21 +11,25 @@ const postConfirmationHandler = async (event, context, callback) => {
     console.info('EVENT info\n' + JSON.stringify(event, null, 2));
     context.callbackWaitsForEmptyEventLoop = false;
     // By default, if callbackWaitsForEmptyEventLoop is true, the Lambda function will wait for the event loop to be empty before returning the response to the caller. Setting it to false allows the function to return immediately, without waiting for the event loop to be empty. This can be useful in scenarios where the function performs async operations that do not need to complete before the function returns, such as sending an email or updating a database.
+    console.log('sub', event.request.userAttributes.sub);
+    console.log('name', event.request.userAttributes.name);
+    console.log('email', event.request.userAttributes.email);
+    console.log('tablename', process.env.USERS_TABLE_NAME);
     const params = {
         TableName: process.env.USERS_TABLE_NAME,
         Item: {
             cognitoid: event.request.userAttributes.sub,
-            username: event.request.userAttributes.username,
+            username: event.request.userAttributes.name,
             email: event.request.userAttributes.email,
         },
         ConditionExpression: 'attribute_not_exists(cognitoid)',
     };
     try {
         await dynamo.send(new lib_dynamodb_1.PutCommand(params));
-        callback(null, {
-            statusCode: 201,
-            body: JSON.stringify(event.body),
-        });
+        // callback(null, {
+        //     statusCode: 201,
+        //     body: JSON.stringify(event.body),
+        // });
     }
     catch (err) {
         console.error(`Error adding item to table: ${err}`);
