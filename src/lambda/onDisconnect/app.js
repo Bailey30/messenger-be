@@ -9,7 +9,7 @@ const disconnectHandler = async (event) => {
     console.log('EVENT', event);
     console.info('EVENT\n' + JSON.stringify(event, null, 2));
     const params = {
-        TableName: process.env.USERS_TABLE_NAME,
+        TableName: process.env.CONNECTIONS_TABLE_NAME,
         Key: {
             connectionId: event.requestContext.connectionId,
         },
