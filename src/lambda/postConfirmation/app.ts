@@ -13,6 +13,11 @@ export const postConfirmationHandler = async (event: any, context: any, callback
     context.callbackWaitsForEmptyEventLoop = false;
     // By default, if callbackWaitsForEmptyEventLoop is true, the Lambda function will wait for the event loop to be empty before returning the response to the caller. Setting it to false allows the function to return immediately, without waiting for the event loop to be empty. This can be useful in scenarios where the function performs async operations that do not need to complete before the function returns, such as sending an email or updating a database.
 
+    console.log('sub', event.request.userAttributes.sub);
+    console.log('name', event.request.userAttributes.name);
+    console.log('email', event.request.userAttributes.email);
+    console.log('tablename', process.env.USERS_TABLE_NAME);
+
     const params = {
         TableName: process.env.USERS_TABLE_NAME,
         Item: {
