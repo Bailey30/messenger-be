@@ -1,16 +1,11 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 
-const AWS = require('aws-sdk');
+// const AWS = require('aws-sdk');
+import { DynamoDBClient, BatchExecuteStatementCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, ScanCommand, PutCommand, GetCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
 
-const dynamodb = new AWS.DynamoDB.DocumentClient({
-    apiVersion: '2012-08-10',
-    region: 'eu-west-2',
-    httpOptions: {
-        timeout: 5000,
-    },
-    maxRetries: 3,
-});
-
+const client = new DynamoDBClient({ region: 'eu-west-2' });
+const dynamo = DynamoDBDocumentClient.from(client);
 export const postConfirmationHandler = async (event: any, context: any, callback: any) => {
     console.log('EVENT', event);
     console.info('EVENT info\n' + JSON.stringify(event, null, 2));
@@ -29,7 +24,7 @@ export const postConfirmationHandler = async (event: any, context: any, callback
     };
 
     try {
-        await dynamodb.put(params).promise();
+        await dynamo.send(new PutCommand(params));
 
         callback(null, {
             statusCode: 201,
