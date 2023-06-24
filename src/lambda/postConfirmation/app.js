@@ -14,7 +14,7 @@ const postConfirmationHandler = async (event, context, callback) => {
     console.log('sub', event.request.userAttributes.sub);
     console.log('name', event.request.userAttributes.name);
     console.log('email', event.request.userAttributes.email);
-    console.log('tablename', process.env.USERS_TABLE_NAME);
+    console.log('tablename');
     const params = {
         TableName: process.env.USERS_TABLE_NAME,
         Item: {

@@ -4,25 +4,23 @@ import { DynamoDBDocumentClient, ScanCommand, PutCommand, GetCommand, DeleteComm
 
 const client = new DynamoDBClient({ region: 'eu-west-2' });
 const dynamo = DynamoDBDocumentClient.from(client);
-export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+export const disconnectHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     console.log('EVENT', event);
     console.info('EVENT\n' + JSON.stringify(event, null, 2));
 
     const params = {
         TableName: process.env.USERS_TABLE_NAME,
-        Item: {
-            cognitoid: 1,
+        Key: {
             connectionId: event.requestContext.connectionId,
         },
-        ConditionExpression: 'attribute_not_exists(cognitoid)',
     };
 
     try {
-        await dynamo.send(new PutCommand(params));
+        await dynamo.send(new DeleteCommand(params));
         return {
             statusCode: 200,
             body: JSON.stringify({
-                message: 'websocket connected',
+                message: 'websocket disconnected',
             }),
         };
         // callback(null, {
@@ -30,13 +28,11 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
         //     body: JSON.stringify(event.body),
         // });
     } catch (err: any) {
-        console.error(`Error adding item to table: ${err}`);
+        console.error(`Error deleting item fro, table: ${err}`);
 
         return {
             statusCode: 500,
             body: JSON.stringify(err.message),
         };
-
-        throw new Error(`Error adding item to table: ${err}`);
     }
 };

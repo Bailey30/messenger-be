@@ -64,13 +64,36 @@ Resources:
             IntegrationType: AWS_PROXY
             IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OnConnectFunction.Arn}/invocations
 
+    DisconnectRoute:
+        Type: AWS::ApiGatewayV2::Route
+        Properties:
+            ApiId: !Ref WebSocketApiGateway
+            RouteKey: $disconnect
+            AuthorizationType: NONE
+            OperationName: DisconnectRoute
+            Target: !Join
+                - "/"
+                - - "integrations"
+                  - !Ref DisconnectInteg
+    DisconnectInteg:
+        Type: AWS::ApiGatewayV2::Integration
+        Properties:
+            ApiId: !Ref WebSocketApiGateway
+            IntegrationType: AWS_PROXY
+            IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OnDisconnectFunction.Arn}/invocations
+
     OnConnectFunction:
         Type: AWS::Serverless::Function
         Properties:
             CodeUri: src/lambda/onConnect
             Handler: app.connectHandler
             Runtime: nodejs18.x
-
+            Environment:
+                Variables:
+                    CONNECTIONS_TABLE_NAME: !Ref ConnectionsTable
+            Policies:
+                - DynamoDBCrudPolicy:
+                      TableName: !Ref ConnectionsTable
     OnConnectPermission:
         Type: AWS::Lambda::Permission
         DependsOn:
@@ -78,6 +101,24 @@ Resources:
         Properties:
             Action: lambda:InvokeFunction
             FunctionName: !Ref OnConnectFunction
+            Principal: apigateway.amazonaws.com
+
+    OnDisconnectFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            CodeUri: src/lambda/onDisconnect
+            Handler: app.disconnectHandler
+            Runtime: nodejs18.x
+            Environment:
+                Variables:
+                    CONNECTIONS_TABLE_NAME: !Ref ConnectionsTable
+    OnDisconnectPermission:
+        Type: AWS::Lambda::Permission
+        DependsOn:
+            - WebSocketApiGateway
+        Properties:
+            Action: lambda:InvokeFunction
+            FunctionName: !Ref OnDisconnectFunction
             Principal: apigateway.amazonaws.com
 
     PostConfirmationFunction:
@@ -99,8 +140,6 @@ Resources:
             Action: lambda:InvokeFunction
             FunctionName: !Ref PostConfirmationFunction
             Principal: cognito-idp.amazonaws.com
-
-    # // create user function
 
     HelloWorldFunction:
         Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction

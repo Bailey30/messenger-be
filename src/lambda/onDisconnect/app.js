@@ -1,27 +1,25 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.connectHandler = void 0;
+exports.disconnectHandler = void 0;
 const client_dynamodb_1 = require("@aws-sdk/client-dynamodb");
 const lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
 const client = new client_dynamodb_1.DynamoDBClient({ region: 'eu-west-2' });
 const dynamo = lib_dynamodb_1.DynamoDBDocumentClient.from(client);
-const connectHandler = async (event) => {
+const disconnectHandler = async (event) => {
     console.log('EVENT', event);
     console.info('EVENT\n' + JSON.stringify(event, null, 2));
     const params = {
         TableName: process.env.USERS_TABLE_NAME,
-        Item: {
-            cognitoid: 1,
+        Key: {
             connectionId: event.requestContext.connectionId,
         },
-        ConditionExpression: 'attribute_not_exists(cognitoid)',
     };
     try {
-        await dynamo.send(new lib_dynamodb_1.PutCommand(params));
+        await dynamo.send(new lib_dynamodb_1.DeleteCommand(params));
         return {
             statusCode: 200,
             body: JSON.stringify({
-                message: 'websocket connected',
+                message: 'websocket disconnected',
             }),
         };
         // callback(null, {
@@ -30,12 +28,11 @@ const connectHandler = async (event) => {
         // });
     }
     catch (err) {
-        console.error(`Error adding item to table: ${err}`);
+        console.error(`Error deleting item fro, table: ${err}`);
         return {
             statusCode: 500,
             body: JSON.stringify(err.message),
         };
-        throw new Error(`Error adding item to table: ${err}`);
     }
 };
-exports.connectHandler = connectHandler;
+exports.disconnectHandler = disconnectHandler;
