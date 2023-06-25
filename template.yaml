@@ -112,6 +112,9 @@ Resources:
             Environment:
                 Variables:
                     CONNECTIONS_TABLE_NAME: !Ref ConnectionsTable
+            Policies:
+                - DynamoDBCrudPolicy:
+                      TableName: !Ref ConnectionsTable
     OnDisconnectPermission:
         Type: AWS::Lambda::Permission
         DependsOn:
