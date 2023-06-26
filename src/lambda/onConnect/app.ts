@@ -11,8 +11,8 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
     const params = {
         TableName: process.env.CONNECTIONS_TABLE_NAME,
         Item: {
-            cognitoid: '1',
             connectionId: event.requestContext.connectionId,
+            cognitoid: '1',
         },
         ConditionExpression: 'attribute_not_exists(cognitoid)',
     };

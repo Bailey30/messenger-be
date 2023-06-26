@@ -82,6 +82,24 @@ Resources:
             IntegrationType: AWS_PROXY
             IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OnDisconnectFunction.Arn}/invocations
 
+    SendMessageRoute:
+        Type: AWS::ApiGatewayV2::Route
+        Properties:
+            ApiId: !Ref WebSocketApiGateway
+            RouteKey: sendMessage
+            AuthorizationType: NONE
+            OperationName: SendMessageRoute
+            Target: !Join
+                - "/"
+                - - "integrations"
+                  - !Ref SendMessageInteg
+    SendMessageInteg:
+        Type: AWS::ApiGatewayV2::Integration
+        Properties:
+            ApiId: !Ref WebSocketApiGateway
+            IntegrationType: AWS_PROXY
+            IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SendMessageFunction.Arn}/invocations
+
     OnConnectFunction:
         Type: AWS::Serverless::Function
         Properties:
@@ -184,10 +202,10 @@ Resources:
         Type: AWS::DynamoDB::Table
         Properties:
             AttributeDefinitions:
-                - AttributeName: cognitoid
+                - AttributeName: connectionId
                   AttributeType: S
             KeySchema:
-                - AttributeName: cognitoid
+                - AttributeName: connectionId
                   KeyType: HASH
             BillingMode: PAY_PER_REQUEST
 
