@@ -162,6 +162,28 @@ Resources:
             FunctionName: !Ref PostConfirmationFunction
             Principal: cognito-idp.amazonaws.com
 
+    SendMessageFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            CodeUri: src/lambda/sendMessage
+            Handler: app.sendMessageHandler
+            Runtime: nodejs18.x
+            Role: !GetAtt FunctionRole.Arn
+            Environment:
+                Variables:
+                    CONNECTIONS_TABLE_NAME: !Ref ConnectionsTable
+            Policies:
+                - DynamoDBCrudPolicy:
+                      TableName: !Ref ConnectionsTable
+    SendMessagePermissions:
+        Type: AWS::Lambda::Permission
+        DependsOn:
+            - ServerlessRestApi
+        Properties:
+            Action: lambda:InvokeFunction
+            FunctionName: !Ref SendMessageFunction
+            Principal: apigateway.amazonaws.com
+
     HelloWorldFunction:
         Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
         Properties:
