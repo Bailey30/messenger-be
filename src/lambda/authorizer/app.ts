@@ -32,7 +32,7 @@ export const authorizerHandler = function (
     var condition: any = {};
     condition.IpAddress = {};
 
-    if (queryStringParameters.token) {
+    if (queryStringParameters.token !== undefined) {
         callback(null, generateAllow('me', event.methodArn));
     } else {
         callback('Unauthorized');
