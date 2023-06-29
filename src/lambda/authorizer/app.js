@@ -26,6 +26,7 @@ const authorizerHandler = function (event, context, callback) {
     var authResponse = {};
     var condition = {};
     condition.IpAddress = {};
+    console.log('queryString token', queryStringParameters.token);
     if (queryStringParameters.token !== undefined) {
         callback(null, generateAllow('me', event.methodArn));
     }
