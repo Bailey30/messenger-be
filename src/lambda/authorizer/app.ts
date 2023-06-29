@@ -1,4 +1,4 @@
-export const handler = function (
+export const authorizerHandler = function (
     event: { headers: any; queryStringParameters: any; stageVariables: any; requestContext: any; methodArn: string },
     context: any,
     callback: any,
