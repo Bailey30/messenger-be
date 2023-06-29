@@ -53,7 +53,7 @@ Resources:
             Name: !Sub "${AWS::StackName}-WebSocketAuthorizer"
             AuthorizerUri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AuthorizerFunction.Arn}/invocations"
             IdentitySource:
-                - $request.header.Authorization
+                - route.request.querystring.token
 
     ConnectRoute:
         Type: AWS::ApiGatewayV2::Route
