@@ -51,8 +51,9 @@ Resources:
             ApiId: !Ref WebSocketApiGateway
             AuthorizerType: REQUEST
             Name: !Sub "${AWS::StackName}-WebSocketAuthorizer"
-
             AuthorizerUri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AuthorizerFunction.Arn}/invocations"
+            IdentitySource:
+                - $request.header.Authorization
 
     ConnectRoute:
         Type: AWS::ApiGatewayV2::Route
