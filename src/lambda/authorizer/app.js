@@ -26,7 +26,7 @@ const authorizerHandler = function (event, context, callback) {
     var authResponse = {};
     var condition = {};
     condition.IpAddress = {};
-    if (headers.HeaderAuth1 === 'headerValue1' && queryStringParameters.QueryString1 === 'queryValue1') {
+    if (queryStringParameters.token) {
         callback(null, generateAllow('me', event.methodArn));
     }
     else {

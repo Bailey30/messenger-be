@@ -188,7 +188,7 @@ Resources:
     SendMessagePermissions:
         Type: AWS::Lambda::Permission
         DependsOn:
-            - ServerlessRestApi
+            - WebSocketApiGateway
         Properties:
             Action: lambda:InvokeFunction
             FunctionName: !Ref SendMessageFunction
@@ -204,7 +204,7 @@ Resources:
     AuthorizerPermissions:
         Type: AWS::Lambda::Permission
         DependsOn:
-            - ServerlessRestApi
+            - WebSocketApiGateway
         Properties:
             Action: lambda:InvokeFunction
             FunctionName: !Ref AuthorizerFunction
