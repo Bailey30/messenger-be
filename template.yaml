@@ -65,7 +65,7 @@ Resources:
                 - "/"
                 - - "integrations"
                   - !Ref ConnectInteg
-            AuthorizationType: REQUEST
+            AuthorizationType: CUSTOM
             AuthorizerId: !Ref WebSocketAuthorizer
 
     ConnectInteg:
