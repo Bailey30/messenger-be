@@ -1,24 +1,40 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { DynamoDBClient, BatchExecuteStatementCommand } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, ScanCommand, PutCommand, GetCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
+import { CognitoIdentityProviderClient, GetUserCommand } from '@aws-sdk/client-cognito-identity-provider';
 
 const client = new DynamoDBClient({ region: 'eu-west-2' });
 const dynamo = DynamoDBDocumentClient.from(client);
+
+const CognitoClient = new CognitoIdentityProviderClient({ region: 'eu-west-2' });
+
 export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     console.log('EVENT', event);
     console.info('EVENT\n' + JSON.stringify(event, null, 2));
-
-    const params = {
-        TableName: process.env.CONNECTIONS_TABLE_NAME,
-        Item: {
-            connectionId: event.requestContext.connectionId,
-            cognitoid: '1',
-        },
-        ConditionExpression: 'attribute_not_exists(cognitoid)',
-    };
+    const accessToken = event.queryStringParameters?.token;
 
     try {
+        const user: any = await CognitoClient.send(
+            new GetUserCommand({
+                AccessToken: accessToken,
+            }),
+        );
+
+        console.log({ user });
+
+        const cognitoId = user?.UserAttributes.find((attr: { Name: string }) => attr.Name === 'sub').Value;
+
+        const params = {
+            TableName: process.env.CONNECTIONS_TABLE_NAME,
+            Item: {
+                connectionId: event.requestContext.connectionId,
+                cognitoid: cognitoId,
+            },
+            ConditionExpression: 'attribute_not_exists(cognitoid)',
+        };
+
         await dynamo.send(new PutCommand(params));
+
         return {
             statusCode: 200,
             body: JSON.stringify({

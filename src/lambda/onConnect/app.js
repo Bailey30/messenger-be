@@ -3,20 +3,28 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.connectHandler = void 0;
 const client_dynamodb_1 = require("@aws-sdk/client-dynamodb");
 const lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
+const client_cognito_identity_provider_1 = require("@aws-sdk/client-cognito-identity-provider");
 const client = new client_dynamodb_1.DynamoDBClient({ region: 'eu-west-2' });
 const dynamo = lib_dynamodb_1.DynamoDBDocumentClient.from(client);
+const CognitoClient = new client_cognito_identity_provider_1.CognitoIdentityProviderClient({ region: 'eu-west-2' });
 const connectHandler = async (event) => {
     console.log('EVENT', event);
     console.info('EVENT\n' + JSON.stringify(event, null, 2));
-    const params = {
-        TableName: process.env.CONNECTIONS_TABLE_NAME,
-        Item: {
-            connectionId: event.requestContext.connectionId,
-            cognitoid: '1',
-        },
-        ConditionExpression: 'attribute_not_exists(cognitoid)',
-    };
+    const accessToken = event.queryStringParameters?.token;
     try {
+        const user = await CognitoClient.send(new client_cognito_identity_provider_1.GetUserCommand({
+            AccessToken: accessToken,
+        }));
+        console.log({ user });
+        const cognitoId = user?.UserAttributes.find((attr) => attr.Name === 'sub').Value;
+        const params = {
+            TableName: process.env.CONNECTIONS_TABLE_NAME,
+            Item: {
+                connectionId: event.requestContext.connectionId,
+                cognitoid: cognitoId,
+            },
+            ConditionExpression: 'attribute_not_exists(cognitoid)',
+        };
         await dynamo.send(new lib_dynamodb_1.PutCommand(params));
         return {
             statusCode: 200,
