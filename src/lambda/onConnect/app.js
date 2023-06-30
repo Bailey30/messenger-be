@@ -26,6 +26,19 @@ const connectHandler = async (event) => {
             ConditionExpression: 'attribute_not_exists(cognitoid)',
         };
         await dynamo.send(new lib_dynamodb_1.PutCommand(params));
+        // set onlineStatus to online in usersTable
+        const usersTableParams = {
+            TableName: process.env.USERS_TABLE_NAME,
+            Key: {
+                cognitoid: cognitoId,
+            },
+            UpdateExpression: 'set onlineStatus = :status',
+            ExpressionAttributeValues: {
+                ':status': { S: 'online' },
+            },
+            ReturnValues: 'ALL_NEW',
+        };
+        await dynamo.send(new client_dynamodb_1.UpdateItemCommand(usersTableParams));
         return {
             statusCode: 200,
             body: JSON.stringify({

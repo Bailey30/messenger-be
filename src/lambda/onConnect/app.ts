@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { DynamoDBClient, BatchExecuteStatementCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, BatchExecuteStatementCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, ScanCommand, PutCommand, GetCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
 import { CognitoIdentityProviderClient, GetUserCommand } from '@aws-sdk/client-cognito-identity-provider';
 
@@ -34,6 +34,22 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
         };
 
         await dynamo.send(new PutCommand(params));
+
+        // set onlineStatus to online in usersTable
+
+        const usersTableParams = {
+            TableName: process.env.USERS_TABLE_NAME,
+            Key: {
+                cognitoid: cognitoId,
+            },
+            UpdateExpression: 'set onlineStatus = :status',
+            ExpressionAttributeValues: {
+                ':status': { S: 'online' },
+            },
+            ReturnValues: 'ALL_NEW',
+        };
+
+        await dynamo.send(new UpdateItemCommand(usersTableParams));
 
         return {
             statusCode: 200,

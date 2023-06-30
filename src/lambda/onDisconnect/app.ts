@@ -17,6 +17,21 @@ export const disconnectHandler = async (event: APIGatewayProxyEvent): Promise<AP
 
     try {
         await dynamo.send(new DeleteCommand(params));
+
+        // set onlineStatus to offline in usersTable
+
+        // const usersTableParams = {
+        //     TableName: process.env.USERS_TABLE_NAME,
+        //     Key: {
+        //         cognitoid: event.requestContext.connectionId,
+        //     },
+        //     UpdateExpression: 'set onlineStatus = :status',
+        //     ExpressionAttributeValues: {
+        //         ':status': { S: 'offline' },
+        //     },
+        //     ReturnValues: 'ALL_NEW',
+        // }
+
         return {
             statusCode: 200,
             body: JSON.stringify({

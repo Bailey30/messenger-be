@@ -24,6 +24,7 @@ export const postConfirmationHandler = async (event: any, context: any, callback
             cognitoid: event.request.userAttributes.sub,
             username: event.request.userAttributes.name,
             email: event.request.userAttributes.email,
+            onlineStatus: 'offline',
         },
         ConditionExpression: 'attribute_not_exists(cognitoid)',
     };
