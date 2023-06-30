@@ -255,6 +255,13 @@ Resources:
             KeySchema:
                 - AttributeName: connectionId
                   KeyType: HASH
+            GlobalSecondaryIndexes:
+                - IndexName: cognitoid
+                  KeySchema:
+                      - AttributeName: cognitoid
+                        KeyType: HASH
+                  Projection:
+                      ProjectionType: ALL
             BillingMode: PAY_PER_REQUEST
 
     FunctionRole:
