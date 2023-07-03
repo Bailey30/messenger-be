@@ -32,9 +32,12 @@ const connectHandler = async (event) => {
         const usersTableParams = {
             TableName: process.env.USERS_TABLE_NAME,
             Key: {
-                cognitoid: cognitoId,
+                cognitoid: { S: cognitoId },
             },
-            UpdateExpression: 'set onlineStatus = :status',
+            UpdateExpression: 'set #onlineStatus = :status',
+            ExpressionAttributeNames: {
+                '#onlineStatus': 'onlineStatus',
+            },
             ExpressionAttributeValues: {
                 ':status': { S: 'online' },
             },
