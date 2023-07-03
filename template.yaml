@@ -139,6 +139,8 @@ Resources:
     # FUNCTIONS AND PERMISSIONS
     OnConnectFunction:
         Type: AWS::Serverless::Function
+        DependsOn:
+            - RestApi
         Properties:
             CodeUri: src/lambda/onConnect
             Handler: app.connectHandler
