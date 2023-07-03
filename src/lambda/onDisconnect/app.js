@@ -15,19 +15,25 @@ const disconnectHandler = async (event) => {
         },
     };
     try {
+        // get cognitoid from connectionTable using connectionid
+        const connection = await dynamo.send(new lib_dynamodb_1.GetCommand(params));
+        console.log('connection', connection);
+        const cognitoid = connection?.Item?.cognitoid;
+        console.log('cognitoid', cognitoid);
+        // change online status of user to offline
+        const usersTableParams = {
+            TableName: process.env.USERS_TABLE_NAME,
+            Key: {
+                cognitoid: cognitoid,
+            },
+            UpdateExpression: 'set onlineStatus = :status',
+            ExpressionAttributeValues: {
+                ':status': { S: 'offline' },
+            },
+            ReturnValues: 'ALL_NEW',
+        };
+        await dynamo.send(new client_dynamodb_1.UpdateItemCommand(usersTableParams));
         await dynamo.send(new lib_dynamodb_1.DeleteCommand(params));
-        // set onlineStatus to offline in usersTable
-        // const usersTableParams = {
-        //     TableName: process.env.USERS_TABLE_NAME,
-        //     Key: {
-        //         cognitoid: event.requestContext.connectionId,
-        //     },
-        //     UpdateExpression: 'set onlineStatus = :status',
-        //     ExpressionAttributeValues: {
-        //         ':status': { S: 'offline' },
-        //     },
-        //     ReturnValues: 'ALL_NEW',
-        // }
         return {
             statusCode: 200,
             body: JSON.stringify({

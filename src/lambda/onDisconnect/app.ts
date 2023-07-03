@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { DynamoDBClient, BatchExecuteStatementCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, BatchExecuteStatementCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, ScanCommand, PutCommand, GetCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
 
 const client = new DynamoDBClient({ region: 'eu-west-2' });
@@ -16,21 +16,28 @@ export const disconnectHandler = async (event: APIGatewayProxyEvent): Promise<AP
     };
 
     try {
+        // get cognitoid from connectionTable using connectionid
+        const connection = await dynamo.send(new GetCommand(params));
+        console.log('connection', connection);
+        const cognitoid = connection?.Item?.cognitoid;
+        console.log('cognitoid', cognitoid);
+
+        // change online status of user to offline
+        const usersTableParams = {
+            TableName: process.env.USERS_TABLE_NAME,
+            Key: {
+                cognitoid: cognitoid,
+            },
+            UpdateExpression: 'set onlineStatus = :status',
+            ExpressionAttributeValues: {
+                ':status': { S: 'offline' },
+            },
+            ReturnValues: 'ALL_NEW',
+        };
+
+        await dynamo.send(new UpdateItemCommand(usersTableParams));
+
         await dynamo.send(new DeleteCommand(params));
-
-        // set onlineStatus to offline in usersTable
-
-        // const usersTableParams = {
-        //     TableName: process.env.USERS_TABLE_NAME,
-        //     Key: {
-        //         cognitoid: event.requestContext.connectionId,
-        //     },
-        //     UpdateExpression: 'set onlineStatus = :status',
-        //     ExpressionAttributeValues: {
-        //         ':status': { S: 'offline' },
-        //     },
-        //     ReturnValues: 'ALL_NEW',
-        // }
 
         return {
             statusCode: 200,
