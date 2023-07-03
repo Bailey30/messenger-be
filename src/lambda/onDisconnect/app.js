@@ -24,9 +24,12 @@ const disconnectHandler = async (event) => {
         const usersTableParams = {
             TableName: process.env.USERS_TABLE_NAME,
             Key: {
-                cognitoid: cognitoid,
+                cognitoid: { S: cognitoid },
             },
-            UpdateExpression: 'set onlineStatus = :status',
+            UpdateExpression: 'set #onlineStatus = :status',
+            ExpressionAttributeNames: {
+                '#onlineStatus': 'onlineStatus',
+            },
             ExpressionAttributeValues: {
                 ':status': { S: 'offline' },
             },

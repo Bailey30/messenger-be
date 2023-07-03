@@ -26,9 +26,12 @@ export const disconnectHandler = async (event: APIGatewayProxyEvent): Promise<AP
         const usersTableParams = {
             TableName: process.env.USERS_TABLE_NAME,
             Key: {
-                cognitoid: cognitoid,
+                cognitoid: { S: cognitoid },
             },
-            UpdateExpression: 'set onlineStatus = :status',
+            UpdateExpression: 'set #onlineStatus = :status',
+            ExpressionAttributeNames: {
+                '#onlineStatus': 'onlineStatus',
+            },
             ExpressionAttributeValues: {
                 ':status': { S: 'offline' },
             },
