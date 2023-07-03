@@ -264,6 +264,12 @@ Resources:
             Handler: app.getUsersHandler
             Runtime: nodejs18.x
             Role: !GetAtt FunctionRole.Arn
+            Environment:
+                Variables:
+                    USERS_TABLE_NAME: !Ref UsersTable
+            Policies:
+                - DynamoDBCrudPolicy:
+                  TableName: !Ref UsersTable
     GetUsersPermission:
         Type: AWS::Lambda::Permission
         DependsOn:
@@ -384,9 +390,15 @@ Outputs:
     WebSocketApiEndpoint:
         Description: WebSocket API endpoint URL
         Value: !Sub "wss://${WebSocketApiGateway}.execute-api.${AWS::Region}.amazonaws.com/"
+    GetUsersEndpoint:
+        Description: Get Users API endpoint URL
+        Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/getUsers"
     OnConnectFunctionArn:
         Description: "OnConnect function ARN"
         Value: !GetAtt OnConnectFunction.Arn
+    GetUsersFunctionArn:
+        Description: Get Users Function ARN
+        Value: !GetAtt GetUsersFunction.Arn
     UserPoolId:
         Description: Messenger userpool ID
         Value: !Ref UserPool
