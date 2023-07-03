@@ -21,6 +21,7 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
         );
 
         console.log({ user });
+        console.log({ user: user?.UserAttributes });
 
         const cognitoId = user?.UserAttributes.find((attr: { Name: string }) => attr.Name === 'sub').Value;
 
