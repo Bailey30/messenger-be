@@ -37,6 +37,17 @@ Resources:
             UserPoolId: !Ref UserPool
             ClientName: messenger-user-pool-client
             GenerateSecret: false
+            # AllowedOAuthFlows:
+            #     - code
+            #     - implicit
+            # ExplicitAuthFlows:
+            #     - ALLOW_USER_SRP_AUTH
+            #     - ALLOW_REFRESH_TOKEN_AUTH
+            # AllowedOAuthScopes:
+            #     - email
+            #     - openid
+            #     - profile
+            #     - aws.cognito.signin.user.admin
 
     #  websocket
     WebSocketApiGateway:
@@ -135,6 +146,7 @@ Resources:
             ApiId: !Ref RestApi
             IntegrationType: AWS_PROXY
             IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetUsersFunction.Arn}/invocations
+            PayloadFormatVersion: "1.0"
 
     # FUNCTIONS AND PERMISSIONS
     OnConnectFunction:
