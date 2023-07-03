@@ -115,6 +115,7 @@ Resources:
     RestApi:
         Type: AWS::ApiGatewayV2::Api
         Properties:
+            Name: !Sub "${AWS::StackName}-MessengerRestApi"
             ProtocolType: HTTP
             RouteSelectionExpression: $request.body.action
 
