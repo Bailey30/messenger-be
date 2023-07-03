@@ -18,6 +18,7 @@ const connectHandler = async (event) => {
         console.log({ user });
         console.log({ user: user?.UserAttributes });
         const cognitoId = user?.UserAttributes.find((attr) => attr.Name === 'sub').Value;
+        console.log({ cognitoId });
         const params = {
             TableName: process.env.CONNECTIONS_TABLE_NAME,
             Item: {
