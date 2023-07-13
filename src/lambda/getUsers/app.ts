@@ -13,6 +13,7 @@ export const getUsersHandler = async (event: any, context: any, callback: any) =
         };
 
         const onlineUsers = await dynamo.send(new ScanCommand(params));
+        console.log({ onlineUsers });
 
         callback(null, {
             statusCode: 200,

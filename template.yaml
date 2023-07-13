@@ -394,7 +394,7 @@ Outputs:
         Value: !Sub "wss://${WebSocketApiGateway}.execute-api.${AWS::Region}.amazonaws.com/"
     GetUsersEndpoint:
         Description: Get Users API endpoint URL
-        Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/getUsers"
+        Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/dev/getUsers"
     OnConnectFunctionArn:
         Description: "OnConnect function ARN"
         Value: !GetAtt OnConnectFunction.Arn

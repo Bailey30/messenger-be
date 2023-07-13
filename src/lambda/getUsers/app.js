@@ -14,6 +14,7 @@ const getUsersHandler = async (event, context, callback) => {
             FilterExpression: '#onlineStatus = :onlineStatus',
         };
         const onlineUsers = await dynamo.send(new client_dynamodb_1.ScanCommand(params));
+        console.log({ onlineUsers });
         callback(null, {
             statusCode: 200,
             body: JSON.stringify(onlineUsers),
