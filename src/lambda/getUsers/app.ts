@@ -4,6 +4,8 @@ import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 const client = new DynamoDBClient({ region: 'eu-west-2' });
 const dynamo = DynamoDBDocumentClient.from(client);
 export const getUsersHandler = async (event: any, context: any, callback: any) => {
+    console.log('EVENT', event);
+
     try {
         const params = {
             TableName: process.env.USERS_TABLE_NAME,
@@ -18,6 +20,11 @@ export const getUsersHandler = async (event: any, context: any, callback: any) =
         callback(null, {
             statusCode: 200,
             body: JSON.stringify(onlineUsers),
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
+                'Access-Control-Allow-Headers': 'Content-Type',
+            },
         });
     } catch (error) {
         console.log(error);
