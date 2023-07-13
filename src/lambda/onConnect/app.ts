@@ -8,6 +8,8 @@ const dynamo = DynamoDBDocumentClient.from(client);
 
 const CognitoClient = new CognitoIdentityProviderClient({ region: 'eu-west-2' });
 
+const AWS = require('aws-sdk');
+
 export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     console.log('EVENT', event);
     console.info('EVENT\n' + JSON.stringify(event, null, 2));
@@ -27,6 +29,8 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
         // gets the cognito id also know as 'sub'
         const cognitoId = user?.UserAttributes.find((attr: { Name: string }) => attr.Name === 'sub').Value;
         console.log({ cognitoId });
+
+        const username = user?.UserAttributes.find((attr: { Name: string }) => attr.Name === 'name').Value;
 
         const params = {
             TableName: process.env.CONNECTIONS_TABLE_NAME,
@@ -59,6 +63,51 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
 
         // updates onlineStatus in usersTable
         await dynamo.send(new UpdateItemCommand(usersTableParams));
+
+        // send websocket to everyone that uses has connected
+        const getConnectionsParams = {
+            TableName: process.env.CONNECTIONS_TABLE_NAME,
+            ProjectionExpression: 'connectionId',
+        };
+        // scan db for all connections
+        const scanResponse = await dynamo.send(new ScanCommand(getConnectionsParams));
+
+        const endpoint = event.requestContext.domainName + '/' + event.requestContext.stage;
+        console.log({ endpoint });
+
+        const apigwManagementApi = new AWS.ApiGatewayManagementApi({
+            apiVersion: '2018-11-29',
+            endpoint: event.requestContext.domainName + '/' + event.requestContext.stage,
+        });
+
+        const sendConnectedMessageToEveryone = scanResponse?.Items?.map(async ({ connectionId }) => {
+            try {
+                await apigwManagementApi
+                    .postToConnection({
+                        ConnectionId: connectionId,
+                        Data: {
+                            type: 'userConnected',
+                            username,
+                            cognitoId,
+                        },
+                    })
+                    .promise();
+            } catch (e: any) {
+                if (e.statusCode === 410) {
+                    console.log(`Found stale connection, deleting ${connectionId}`);
+                    await dynamo.send(
+                        new DeleteCommand({ TableName: process.env.CONNECTIONS_TABLE_NAME, Key: { connectionId } }),
+                    );
+                    throw e;
+                }
+            }
+        });
+
+        try {
+            sendConnectedMessageToEveryone && (await Promise.all(sendConnectedMessageToEveryone));
+        } catch (error) {
+            console.log(error);
+        }
 
         return {
             statusCode: 200,
