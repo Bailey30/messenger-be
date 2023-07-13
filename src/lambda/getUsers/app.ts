@@ -17,9 +17,19 @@ export const getUsersHandler = async (event: any, context: any, callback: any) =
         const onlineUsers = await dynamo.send(new ScanCommand(params));
         console.log({ onlineUsers });
 
+        const formattedUsers = onlineUsers?.Items?.map((user: any) => {
+            return {
+                cognitoid: user.cognitoid.S,
+                onlineStatus: user.onlineStatus.S,
+                username: user.username.S,
+            };
+        });
+
+        console.log({ formattedUsers });
+
         callback(null, {
             statusCode: 200,
-            body: JSON.stringify(onlineUsers),
+            body: JSON.stringify(formattedUsers),
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',

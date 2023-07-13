@@ -12,11 +12,13 @@ const connectHandler = async (event) => {
     console.info('EVENT\n' + JSON.stringify(event, null, 2));
     const accessToken = event.queryStringParameters?.token;
     try {
+        //gets details of the user using the provided access token
         const user = await CognitoClient.send(new client_cognito_identity_provider_1.GetUserCommand({
             AccessToken: accessToken,
         }));
         console.log({ user });
         console.log({ user: user?.UserAttributes });
+        // gets the cognito id also know as 'sub'
         const cognitoId = user?.UserAttributes.find((attr) => attr.Name === 'sub').Value;
         console.log({ cognitoId });
         const params = {
@@ -27,6 +29,7 @@ const connectHandler = async (event) => {
             },
             ConditionExpression: 'attribute_not_exists(cognitoid)',
         };
+        // adds connectionId and cognitoId to the connections table
         await dynamo.send(new lib_dynamodb_1.PutCommand(params));
         // set onlineStatus to online in usersTable
         const usersTableParams = {
@@ -43,6 +46,7 @@ const connectHandler = async (event) => {
             },
             ReturnValues: 'ALL_NEW',
         };
+        // updates onlineStatus in usersTable
         await dynamo.send(new client_dynamodb_1.UpdateItemCommand(usersTableParams));
         return {
             statusCode: 200,
@@ -50,10 +54,6 @@ const connectHandler = async (event) => {
                 message: 'websocket connected',
             }),
         };
-        // callback(null, {
-        //     statusCode: 201,
-        //     body: JSON.stringify(event.body),
-        // });
     }
     catch (err) {
         console.error(`Error adding item to table: ${err}`);

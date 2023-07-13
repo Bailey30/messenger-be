@@ -14,6 +14,7 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
     const accessToken = event.queryStringParameters?.token;
 
     try {
+        //gets details of the user using the provided access token
         const user: any = await CognitoClient.send(
             new GetUserCommand({
                 AccessToken: accessToken,
@@ -23,6 +24,7 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
         console.log({ user });
         console.log({ user: user?.UserAttributes });
 
+        // gets the cognito id also know as 'sub'
         const cognitoId = user?.UserAttributes.find((attr: { Name: string }) => attr.Name === 'sub').Value;
         console.log({ cognitoId });
 
@@ -35,6 +37,7 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
             ConditionExpression: 'attribute_not_exists(cognitoid)',
         };
 
+        // adds connectionId and cognitoId to the connections table
         await dynamo.send(new PutCommand(params));
 
         // set onlineStatus to online in usersTable
@@ -54,6 +57,7 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
             ReturnValues: 'ALL_NEW',
         };
 
+        // updates onlineStatus in usersTable
         await dynamo.send(new UpdateItemCommand(usersTableParams));
 
         return {
@@ -62,10 +66,6 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
                 message: 'websocket connected',
             }),
         };
-        // callback(null, {
-        //     statusCode: 201,
-        //     body: JSON.stringify(event.body),
-        // });
     } catch (err: any) {
         console.error(`Error adding item to table: ${err}`);
 
