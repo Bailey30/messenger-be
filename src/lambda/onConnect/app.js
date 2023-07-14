@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.connectHandler = void 0;
+const broadcastWebsocket_1 = require("./../../utils/broadcastWebsocket");
 const client_dynamodb_1 = require("@aws-sdk/client-dynamodb");
 const lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
 const client_cognito_identity_provider_1 = require("@aws-sdk/client-cognito-identity-provider");
@@ -88,41 +89,44 @@ const connectHandler = async (event) => {
         // }) as Promise<void>[];
         try {
             const endpoint = 'https://' + event.requestContext.domainName + '/' + event.requestContext.stage;
-            console.log({ endpoint });
             const APIGWClient = new client_apigatewaymanagementapi_1.ApiGatewayManagementApiClient({ region: 'eu-west-2', endpoint });
-            const sendConnectedMessageToEveryone = async () => {
-                if (!scanResponse.Items)
-                    return;
-                for (const connection of scanResponse.Items) {
-                    const connectionId = connection.connectionId;
-                    const data = JSON.stringify({
-                        type: 'userConnected',
-                        username,
-                        cognitoId,
-                    });
-                    try {
-                        const response = await APIGWClient.send(new client_apigatewaymanagementapi_1.PostToConnectionCommand({
-                            ConnectionId: connectionId,
-                            Data: data,
-                        }));
-                        console.log({ response });
-                    }
-                    catch (e) {
-                        if (e.statusCode === 410) {
-                            console.log(`Found stale connection, deleting ${connectionId}`);
-                            await dynamo.send(new lib_dynamodb_1.DeleteCommand({
-                                TableName: process.env.CONNECTIONS_TABLE_NAME,
-                                Key: { connectionId },
-                            }));
-                            throw e;
-                        }
-                        console.log({ e });
-                    }
-                }
-            };
+            const broadCaster = new broadcastWebsocket_1.websocketBroadcaster(process.env.CONNECTIONS_TABLE_NAME, APIGWClient, dynamo, lib_dynamodb_1.ScanCommand, client_apigatewaymanagementapi_1.PostToConnectionCommand, lib_dynamodb_1.DeleteCommand, username, cognitoId);
+            // const sendConnectedMessageToEveryone = async () => {
+            //     if (!scanResponse.Items) return;
+            //     for (const connection of scanResponse.Items) {
+            //         const connectionId = connection.connectionId;
+            //         const data = JSON.stringify({
+            //             type: 'userConnected',
+            //             username,
+            //             cognitoId,
+            //         });
+            //         try {
+            //             const response = await APIGWClient.send(
+            //                 new PostToConnectionCommand({
+            //                     ConnectionId: connectionId,
+            //                     Data: data,
+            //                 }),
+            //             );
+            //             console.log({ response });
+            //         } catch (e: any) {
+            //             if (e.statusCode === 410) {
+            //                 console.log(`Found stale connection, deleting ${connectionId}`);
+            //                 await dynamo.send(
+            //                     new DeleteCommand({
+            //                         TableName: process.env.CONNECTIONS_TABLE_NAME,
+            //                         Key: { connectionId },
+            //                     }),
+            //                 );
+            //                 throw e;
+            //             }
+            //             console.log({ e });
+            //         }
+            //     }
+            // };
             try {
                 // await Promise.all(sendConnectedMessageToEveryone);
-                await sendConnectedMessageToEveryone();
+                // await sendConnectedMessageToEveryone();
+                await broadCaster.broadcast('userConnected');
             }
             catch (error) {
                 console.log(error);

@@ -197,6 +197,12 @@ Resources:
                       TableName: !Ref ConnectionsTable
                 - DynamoDBCrudPolicy:
                       TableName: !Ref UsersTable
+                - Statement:
+                      - Effect: Allow
+                        Action:
+                            - "execute-api:ManageConnections"
+                        Resource:
+                            - !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebSocketApiGateway}/*"
     OnDisconnectPermission:
         Type: AWS::Lambda::Permission
         DependsOn:
