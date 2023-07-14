@@ -87,7 +87,7 @@ const connectHandler = async (event) => {
             }
         });
         try {
-            sendConnectedMessageToEveryone && (await Promise.all(sendConnectedMessageToEveryone));
+            await Promise.all(sendConnectedMessageToEveryone);
         }
         catch (error) {
             console.log(error);

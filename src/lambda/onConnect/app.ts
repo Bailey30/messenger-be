@@ -106,10 +106,10 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
                     throw e;
                 }
             }
-        });
+        }) as Promise<void>[];
 
         try {
-            sendConnectedMessageToEveryone && (await Promise.all(sendConnectedMessageToEveryone));
+            await Promise.all(sendConnectedMessageToEveryone);
         } catch (error) {
             console.log(error);
         }
