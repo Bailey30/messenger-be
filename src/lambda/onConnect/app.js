@@ -12,7 +12,7 @@ const connectHandler = async (event) => {
     console.log('EVENT', event);
     console.info('EVENT\n' + JSON.stringify(event, null, 2));
     const accessToken = event.queryStringParameters?.token;
-    const endpoint = event.requestContext.domainName + '/' + event.requestContext.stage;
+    const endpoint = 'https://' + event.requestContext.domainName + '/' + event.requestContext.stage;
     const APIGWClient = new client_apigatewaymanagementapi_1.ApiGatewayManagementApiClient({ region: 'eu-west-2', endpoint });
     try {
         //gets details of the user using the provided access token
