@@ -2,13 +2,13 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { DynamoDBClient, BatchExecuteStatementCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, ScanCommand, PutCommand, GetCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
 import { CognitoIdentityProviderClient, GetUserCommand } from '@aws-sdk/client-cognito-identity-provider';
+import { PostToConnectionCommand, ApiGatewayManagementApiClient } from '@aws-sdk/client-apigatewaymanagementapi';
 
 const client = new DynamoDBClient({ region: 'eu-west-2' });
 const dynamo = DynamoDBDocumentClient.from(client);
 
 const CognitoClient = new CognitoIdentityProviderClient({ region: 'eu-west-2' });
-
-const AWS = require('aws-sdk');
+const APIGWClient = new ApiGatewayManagementApiClient({ region: 'eu-west-2' });
 
 export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     console.log('EVENT', event);
@@ -75,23 +75,25 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
         const endpoint = event.requestContext.domainName + '/' + event.requestContext.stage;
         console.log({ endpoint });
 
-        const apigwManagementApi = new AWS.ApiGatewayManagementApi({
-            apiVersion: '2018-11-29',
-            endpoint: event.requestContext.domainName + '/' + event.requestContext.stage,
-        });
+        // const apigwManagementApi = new AWS.ApiGatewayManagementApi({
+        //     apiVersion: '2018-11-29',
+        //     endpoint: event.requestContext.domainName + '/' + event.requestContext.stage,
+        // });
 
         const sendConnectedMessageToEveryone = scanResponse?.Items?.map(async ({ connectionId }) => {
+            const data = JSON.stringify({
+                type: 'userConnected',
+                username,
+                cognitoId,
+            });
+
             try {
-                await apigwManagementApi
-                    .postToConnection({
+                await APIGWClient.send(
+                    new PostToConnectionCommand({
                         ConnectionId: connectionId,
-                        Data: {
-                            type: 'userConnected',
-                            username,
-                            cognitoId,
-                        },
-                    })
-                    .promise();
+                        Data: data,
+                    }),
+                );
             } catch (e: any) {
                 if (e.statusCode === 410) {
                     console.log(`Found stale connection, deleting ${connectionId}`);
