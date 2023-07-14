@@ -65,16 +65,18 @@ const connectHandler = async (event) => {
         //     endpoint: event.requestContext.domainName + '/' + event.requestContext.stage,
         // });
         const sendConnectedMessageToEveryone = scanResponse?.Items?.map(async ({ connectionId }) => {
+            console.log({ connectionId });
             const data = JSON.stringify({
                 type: 'userConnected',
                 username,
                 cognitoId,
             });
             try {
-                await APIGWClient.send(new client_apigatewaymanagementapi_1.PostToConnectionCommand({
+                const response = await APIGWClient.send(new client_apigatewaymanagementapi_1.PostToConnectionCommand({
                     ConnectionId: connectionId,
                     Data: data,
                 }));
+                console.log({ response });
             }
             catch (e) {
                 if (e.statusCode === 410) {

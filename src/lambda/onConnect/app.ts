@@ -82,6 +82,7 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
         // });
 
         const sendConnectedMessageToEveryone = scanResponse?.Items?.map(async ({ connectionId }) => {
+            console.log({ connectionId });
             const data = JSON.stringify({
                 type: 'userConnected',
                 username,
@@ -89,12 +90,13 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
             });
 
             try {
-                await APIGWClient.send(
+                const response = await APIGWClient.send(
                     new PostToConnectionCommand({
                         ConnectionId: connectionId,
                         Data: data,
                     }),
                 );
+                console.log({ response });
             } catch (e: any) {
                 if (e.statusCode === 410) {
                     console.log(`Found stale connection, deleting ${connectionId}`);
