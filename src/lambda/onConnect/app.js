@@ -8,11 +8,12 @@ const client_apigatewaymanagementapi_1 = require("@aws-sdk/client-apigatewaymana
 const client = new client_dynamodb_1.DynamoDBClient({ region: 'eu-west-2' });
 const dynamo = lib_dynamodb_1.DynamoDBDocumentClient.from(client);
 const CognitoClient = new client_cognito_identity_provider_1.CognitoIdentityProviderClient({ region: 'eu-west-2' });
-const APIGWClient = new client_apigatewaymanagementapi_1.ApiGatewayManagementApiClient({ region: 'eu-west-2' });
 const connectHandler = async (event) => {
     console.log('EVENT', event);
     console.info('EVENT\n' + JSON.stringify(event, null, 2));
     const accessToken = event.queryStringParameters?.token;
+    const endpoint = event.requestContext.domainName + '/' + event.requestContext.stage;
+    const APIGWClient = new client_apigatewaymanagementapi_1.ApiGatewayManagementApiClient({ region: 'eu-west-2', endpoint });
     try {
         //gets details of the user using the provided access token
         const user = await CognitoClient.send(new client_cognito_identity_provider_1.GetUserCommand({
@@ -58,7 +59,6 @@ const connectHandler = async (event) => {
         };
         // scan db for all connections
         const scanResponse = await dynamo.send(new lib_dynamodb_1.ScanCommand(getConnectionsParams));
-        const endpoint = event.requestContext.domainName + '/' + event.requestContext.stage;
         console.log({ endpoint });
         // const apigwManagementApi = new AWS.ApiGatewayManagementApi({
         //     apiVersion: '2018-11-29',

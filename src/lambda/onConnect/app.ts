@@ -8,12 +8,14 @@ const client = new DynamoDBClient({ region: 'eu-west-2' });
 const dynamo = DynamoDBDocumentClient.from(client);
 
 const CognitoClient = new CognitoIdentityProviderClient({ region: 'eu-west-2' });
-const APIGWClient = new ApiGatewayManagementApiClient({ region: 'eu-west-2' });
 
 export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     console.log('EVENT', event);
     console.info('EVENT\n' + JSON.stringify(event, null, 2));
     const accessToken = event.queryStringParameters?.token;
+
+    const endpoint = event.requestContext.domainName + '/' + event.requestContext.stage;
+    const APIGWClient = new ApiGatewayManagementApiClient({ region: 'eu-west-2', endpoint });
 
     try {
         //gets details of the user using the provided access token
@@ -72,7 +74,6 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
         // scan db for all connections
         const scanResponse = await dynamo.send(new ScanCommand(getConnectionsParams));
 
-        const endpoint = event.requestContext.domainName + '/' + event.requestContext.stage;
         console.log({ endpoint });
 
         // const apigwManagementApi = new AWS.ApiGatewayManagementApi({
