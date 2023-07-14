@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.connectHandler = void 0;
-const broadcastWebsocket_js_1 = require("./../../utils/broadcastWebsocket.js");
+const broadcastWebsocket_1 = require("../../utils/broadcastWebsocket");
 const client_dynamodb_1 = require("@aws-sdk/client-dynamodb");
 const lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
 const client_cognito_identity_provider_1 = require("@aws-sdk/client-cognito-identity-provider");
@@ -90,7 +90,7 @@ const connectHandler = async (event) => {
         try {
             const endpoint = 'https://' + event.requestContext.domainName + '/' + event.requestContext.stage;
             const APIGWClient = new client_apigatewaymanagementapi_1.ApiGatewayManagementApiClient({ region: 'eu-west-2', endpoint });
-            const broadCaster = new broadcastWebsocket_js_1.websocketBroadcaster(process.env.CONNECTIONS_TABLE_NAME, APIGWClient, dynamo, lib_dynamodb_1.ScanCommand, client_apigatewaymanagementapi_1.PostToConnectionCommand, lib_dynamodb_1.DeleteCommand, username, cognitoId);
+            const broadCaster = new broadcastWebsocket_1.websocketBroadcaster(process.env.CONNECTIONS_TABLE_NAME, APIGWClient, dynamo, lib_dynamodb_1.ScanCommand, client_apigatewaymanagementapi_1.PostToConnectionCommand, lib_dynamodb_1.DeleteCommand, username, cognitoId);
             // const sendConnectedMessageToEveryone = async () => {
             //     if (!scanResponse.Items) return;
             //     for (const connection of scanResponse.Items) {

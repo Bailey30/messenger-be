@@ -1,4 +1,4 @@
-import { websocketBroadcaster } from './../../utils/broadcastWebsocket.js';
+import { websocketBroadcaster } from '../../utils/broadcastWebsocket';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { DynamoDBClient, BatchExecuteStatementCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, ScanCommand, PutCommand, GetCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
