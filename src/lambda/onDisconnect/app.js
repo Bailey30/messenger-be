@@ -15,6 +15,7 @@ const disconnectHandler = async (event) => {
         },
     };
     try {
+        // maybe make cognito id as primary key again so we can use condition expression in onconnect
         // get cognitoid from connectionTable using connectionid
         const connection = await dynamo.send(new lib_dynamodb_1.GetCommand(params));
         console.log('connection', connection);

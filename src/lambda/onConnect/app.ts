@@ -40,7 +40,7 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
                 connectionId: event.requestContext.connectionId,
                 cognitoid: cognitoId,
             },
-            ConditionExpression: 'attribute_not_exists(cognitoid)',
+            ConditionExpression: 'attribute_not_exists(cognitoid)', // this does nothing because cognito id is not the primary key
         };
 
         // adds connectionId and cognitoId to the connections table
@@ -81,35 +81,66 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
         //     endpoint: event.requestContext.domainName + '/' + event.requestContext.stage,
         // });
 
-        const sendConnectedMessageToEveryone = scanResponse?.Items?.map(async ({ connectionId }) => {
-            console.log({ connectionId });
-            const data = JSON.stringify({
-                type: 'userConnected',
-                username,
-                cognitoId,
-            });
+        // const sendConnectedMessageToEveryone = scanResponse?.Items?.map(async ({ connectionId }) => {
+        //     console.log({ connectionId });
+        //     const data = JSON.stringify({
+        //         type: 'userConnected',
+        //         username,
+        //         cognitoId,
+        //     });
 
-            try {
-                const response = await APIGWClient.send(
-                    new PostToConnectionCommand({
-                        ConnectionId: connectionId,
-                        Data: data,
-                    }),
-                );
-                console.log({ response });
-            } catch (e: any) {
-                if (e.statusCode === 410) {
-                    console.log(`Found stale connection, deleting ${connectionId}`);
-                    await dynamo.send(
-                        new DeleteCommand({ TableName: process.env.CONNECTIONS_TABLE_NAME, Key: { connectionId } }),
+        //     try {
+        //         const response = await APIGWClient.send(
+        //             new PostToConnectionCommand({
+        //                 ConnectionId: connectionId,
+        //                 Data: data,
+        //             }),
+        //         );
+        //         console.log({ response });
+        //     } catch (e: any) {
+        //         if (e.statusCode === 410) {
+        //             console.log(`Found stale connection, deleting ${connectionId}`);
+        //             await dynamo.send(
+        //                 new DeleteCommand({ TableName: process.env.CONNECTIONS_TABLE_NAME, Key: { connectionId } }),
+        //             );
+        //             throw e;
+        //         }
+        //     }
+        // }) as Promise<void>[];
+
+        const sendConnectedMessageToEveryone = async () => {
+            if (!scanResponse.Items) return;
+            for (const connection of scanResponse.Items) {
+                const connectionId = connection.connectionId;
+                const data = JSON.stringify({
+                    type: 'userConnected',
+                    username,
+                    cognitoId,
+                });
+
+                try {
+                    const response = await APIGWClient.send(
+                        new PostToConnectionCommand({
+                            ConnectionId: connectionId,
+                            Data: data,
+                        }),
                     );
-                    throw e;
+                    console.log({ response });
+                } catch (e: any) {
+                    if (e.statusCode === 410) {
+                        console.log(`Found stale connection, deleting ${connectionId}`);
+                        await dynamo.send(
+                            new DeleteCommand({ TableName: process.env.CONNECTIONS_TABLE_NAME, Key: { connectionId } }),
+                        );
+                        throw e;
+                    }
                 }
             }
-        }) as Promise<void>[];
+        };
 
         try {
-            await Promise.all(sendConnectedMessageToEveryone);
+            // await Promise.all(sendConnectedMessageToEveryone);
+            await sendConnectedMessageToEveryone();
         } catch (error) {
             console.log(error);
         }

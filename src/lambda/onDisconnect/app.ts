@@ -16,6 +16,7 @@ export const disconnectHandler = async (event: APIGatewayProxyEvent): Promise<AP
     };
 
     try {
+        // maybe make cognito id as primary key again so we can use condition expression in onconnect
         // get cognitoid from connectionTable using connectionid
         const connection = await dynamo.send(new GetCommand(params));
         console.log('connection', connection);
