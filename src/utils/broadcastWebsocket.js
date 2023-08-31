@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.websocketBroadcaster = void 0;
-class websocketBroadcaster {
+export class websocketBroadcaster {
     constructor(connectionsTableName, APIGWClient, dynamodbClient, scanCommand, postToConnectionCommand, deleteCommand, username, cognitoId) {
         this.connectionsTableName = connectionsTableName;
         this.APIGWClient = APIGWClient;
@@ -50,4 +47,3 @@ class websocketBroadcaster {
         }
     }
 }
-exports.websocketBroadcaster = websocketBroadcaster;

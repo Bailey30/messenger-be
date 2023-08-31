@@ -1,11 +1,8 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.disconnectHandler = void 0;
-const client_dynamodb_1 = require("@aws-sdk/client-dynamodb");
-const lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
-const client = new client_dynamodb_1.DynamoDBClient({ region: 'eu-west-2' });
-const dynamo = lib_dynamodb_1.DynamoDBDocumentClient.from(client);
-const disconnectHandler = async (event) => {
+import { DynamoDBClient, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, GetCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
+const client = new DynamoDBClient({ region: 'eu-west-2' });
+const dynamo = DynamoDBDocumentClient.from(client);
+export const disconnectHandler = async (event) => {
     console.log('EVENT', event);
     console.info('EVENT\n' + JSON.stringify(event, null, 2));
     const params = {
@@ -17,7 +14,7 @@ const disconnectHandler = async (event) => {
     try {
         // maybe make cognito id as primary key again so we can use condition expression in onconnect
         // get cognitoid from connectionTable using connectionid
-        const connection = await dynamo.send(new lib_dynamodb_1.GetCommand(params));
+        const connection = await dynamo.send(new GetCommand(params));
         console.log('connection', connection);
         const cognitoid = connection?.Item?.cognitoid;
         console.log('cognitoid', cognitoid);
@@ -36,8 +33,8 @@ const disconnectHandler = async (event) => {
             },
             ReturnValues: 'ALL_NEW',
         };
-        await dynamo.send(new client_dynamodb_1.UpdateItemCommand(usersTableParams));
-        await dynamo.send(new lib_dynamodb_1.DeleteCommand(params));
+        await dynamo.send(new UpdateItemCommand(usersTableParams));
+        await dynamo.send(new DeleteCommand(params));
         return {
             statusCode: 200,
             body: JSON.stringify({
@@ -57,4 +54,3 @@ const disconnectHandler = async (event) => {
         };
     }
 };
-exports.disconnectHandler = disconnectHandler;

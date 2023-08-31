@@ -1,11 +1,8 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUsersHandler = void 0;
-const client_dynamodb_1 = require("@aws-sdk/client-dynamodb");
-const lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
-const client = new client_dynamodb_1.DynamoDBClient({ region: 'eu-west-2' });
-const dynamo = lib_dynamodb_1.DynamoDBDocumentClient.from(client);
-const getUsersHandler = async (event, context, callback) => {
+import { DynamoDBClient, ScanCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
+const client = new DynamoDBClient({ region: 'eu-west-2' });
+const dynamo = DynamoDBDocumentClient.from(client);
+export const getUsersHandler = async (event, context, callback) => {
     console.log('EVENT', event);
     try {
         const params = {
@@ -14,7 +11,7 @@ const getUsersHandler = async (event, context, callback) => {
             ExpressionAttributeValues: { ':onlineStatus': { S: 'online' } },
             FilterExpression: '#onlineStatus = :onlineStatus',
         };
-        const onlineUsers = await dynamo.send(new client_dynamodb_1.ScanCommand(params));
+        const onlineUsers = await dynamo.send(new ScanCommand(params));
         console.log({ onlineUsers });
         const formattedUsers = onlineUsers?.Items?.map((user) => {
             return {
@@ -42,4 +39,3 @@ const getUsersHandler = async (event, context, callback) => {
         });
     }
 };
-exports.getUsersHandler = getUsersHandler;

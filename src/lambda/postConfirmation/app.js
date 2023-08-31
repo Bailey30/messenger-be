@@ -1,12 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.postConfirmationHandler = void 0;
 // const AWS = require('aws-sdk');
-const client_dynamodb_1 = require("@aws-sdk/client-dynamodb");
-const lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
-const client = new client_dynamodb_1.DynamoDBClient({ region: 'eu-west-2' });
-const dynamo = lib_dynamodb_1.DynamoDBDocumentClient.from(client);
-const postConfirmationHandler = async (event, context, callback) => {
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
+const client = new DynamoDBClient({ region: 'eu-west-2' });
+const dynamo = DynamoDBDocumentClient.from(client);
+export const postConfirmationHandler = async (event, context, callback) => {
     console.log('EVENT', event);
     console.info('EVENT info\n' + JSON.stringify(event, null, 2));
     context.callbackWaitsForEmptyEventLoop = false;
@@ -26,7 +23,7 @@ const postConfirmationHandler = async (event, context, callback) => {
         ConditionExpression: 'attribute_not_exists(cognitoid)',
     };
     try {
-        await dynamo.send(new lib_dynamodb_1.PutCommand(params));
+        await dynamo.send(new PutCommand(params));
         // callback(null, {
         //     statusCode: 201,
         //     body: JSON.stringify(event.body),
@@ -42,4 +39,3 @@ const postConfirmationHandler = async (event, context, callback) => {
     }
     return event;
 };
-exports.postConfirmationHandler = postConfirmationHandler;
