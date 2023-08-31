@@ -5,9 +5,8 @@
 
 export default {
     transform: {
-        // '^.+\\.ts?$': 'ts-jest',
+        '^.+\\.ts?$': 'ts-jest',
     },
-    testEnvironment: 'jest-environment-node',
     clearMocks: true,
     collectCoverage: true,
     coverageDirectory: 'coverage',
