@@ -13,18 +13,18 @@ const connectHandler = async(event) => {
     ///// testtst
     console.log('EVENT', event);
     console.info('EVENT\n' + JSON.stringify(event, null, 2));
-    const accessToken = event.queryStringParameters ? .token;
+    const accessToken = event.queryStringParameters?.token;
     try {
         //gets details of the user using the provided access token
         const user = await CognitoClient.send(new client_cognito_identity_provider_1.GetUserCommand({
             AccessToken: accessToken,
         }));
         console.log({ user });
-        console.log({ user: user ? .UserAttributes });
+        console.log({ user: user?.UserAttributes });
         // gets the cognito id also know as 'sub'
-        const cognitoId = user ? .UserAttributes.find((attr) => attr.Name === 'sub').Value;
+        const cognitoId = user?.UserAttributes.find((attr) => attr.Name === 'sub').Value;
         console.log({ cognitoId });
-        const username = user ? .UserAttributes.find((attr) => attr.Name === 'name').Value;
+        const username = user?.UserAttributes.find((attr) => attr.Name === 'name').Value;
         const params = {
             TableName: process.env.CONNECTIONS_TABLE_NAME,
             Item: {
