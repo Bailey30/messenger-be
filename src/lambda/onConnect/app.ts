@@ -1,7 +1,7 @@
 
 // import { websocketBroadcaster } from '../../utils/nodejs/node_modules/broadcastWebsocket';
-const websocketBroadcaster = require("broadcastWebsocket")
-
+// const websocketBroadcaster = require("broadcastWebsocket")
+import {websocketBroadcaster} from "../../utils/nodejs/node_modules/broadcastWebsocket"
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { DynamoDBClient, BatchExecuteStatementCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
