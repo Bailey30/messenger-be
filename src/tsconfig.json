@@ -20,10 +20,13 @@
     "**/*.test.ts",
     "**/*.config.ts"
   ],
-  "include": [
-    "*.ts",
-    "lambda/*/*",
-    "utils/*/*",
-    "utils/*"
-, "utils/nodejs/node_modules/broadcastWebsocket/broadcastWebsocket.js"  ]
+//   "include": [
+//     "*.ts",
+//     "lambda/*/*",
+//     "utils/*/*",
+//     "utils/*",
+//     "utils/*/*/*/*",
+//     "utils/",
+
+//  "utils/nodejs/node_modules/broadcastWebsocket/index.ts"  ]
 }
