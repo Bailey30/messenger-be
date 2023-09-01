@@ -157,6 +157,8 @@ Resources:
             CodeUri: src/lambda/onConnect
             Handler: app.connectHandler
             Runtime: nodejs18.x
+            Layers:
+                - !Ref UtilsLayer
             Environment:
                 Variables:
                     CONNECTIONS_TABLE_NAME: !Ref ConnectionsTable
@@ -373,6 +375,17 @@ Resources:
                                 - logs:PutLogEvents
                                 - lambda:InvokeFunction
                             Resource: "*"
+
+    # Layers
+    UtilsLayer:
+        Type: AWS::Serverless::LayerVersion
+        Properties:
+          ContentUri: ./src/utils
+          LayerName: UtilsLayer
+          Description: Layer that contains utility functions
+          CompatibleRuntimes:
+            - "nodejs18.x"
+
 
     ApplicationResourceGroup:
         Type: AWS::ResourceGroups::Group

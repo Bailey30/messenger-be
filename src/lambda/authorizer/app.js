@@ -1,4 +1,7 @@
-export const authorizerHandler = function (event, context, callback) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.authorizerHandler = void 0;
+const authorizerHandler = function (event, context, callback) {
     console.log('Received event:', JSON.stringify(event, null, 2));
     // A simple REQUEST authorizer example to demonstrate how to use request
     // parameters to allow or deny a request. In this example, a request is
@@ -31,6 +34,7 @@ export const authorizerHandler = function (event, context, callback) {
         callback('Unauthorized');
     }
 };
+exports.authorizerHandler = authorizerHandler;
 // Helper function to generate an IAM policy
 var generatePolicy = function (principalId, effect, resource) {
     // Required output:

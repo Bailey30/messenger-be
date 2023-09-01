@@ -25,5 +25,5 @@
     "lambda/*/*",
     "utils/*/*",
     "utils/*"
-  ]
+, "utils/nodejs/node_modules/broadcastWebsocket/broadcastWebsocket.js"  ]
 }

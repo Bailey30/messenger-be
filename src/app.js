@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.lambdaHandler = void 0;
 /**
  *
  * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
@@ -7,7 +10,7 @@
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  *
  */
-export const lambdaHandler = async (event) => {
+const lambdaHandler = async (event) => {
     // push test
     // push test
     // push test
@@ -29,3 +32,4 @@ export const lambdaHandler = async (event) => {
         };
     }
 };
+exports.lambdaHandler = lambdaHandler;
