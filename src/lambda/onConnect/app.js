@@ -3,7 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.connectHandler = void 0;
 // import { websocketBroadcaster } from '../../utils/nodejs/node_modules/broadcastWebsocket';
 // const websocketBroadcaster = require("broadcastWebsocket")
-const broadcastWebsocket_1 = require("../../utils/nodejs/node_modules/broadcastWebsocket");
+// @ts-ignore
+const broadcastWebsocket_1 = require("/opt/nodejs/broadcastWebsocket");
 const client_dynamodb_1 = require("@aws-sdk/client-dynamodb");
 const lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
 const client_cognito_identity_provider_1 = require("@aws-sdk/client-cognito-identity-provider");
