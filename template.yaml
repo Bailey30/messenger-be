@@ -380,7 +380,7 @@ Resources:
     UtilsLayer:
         Type: AWS::Serverless::LayerVersion
         Properties:
-          ContentUri: ./src/utils
+          ContentUri: src/utils
           LayerName: UtilsLayer
           Description: Layer that contains utility functions
           CompatibleRuntimes:
