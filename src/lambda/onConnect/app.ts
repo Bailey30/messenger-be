@@ -111,6 +111,17 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
             const endpoint = 'https://' + event.requestContext.domainName + '/' + event.requestContext.stage;
             const APIGWClient = new ApiGatewayManagementApiClient({ region: 'eu-west-2', endpoint });
 
+            const broadCaster = new websocketBroadcaster(
+                process.env.CONNECTIONS_TABLE_NAME,
+                APIGWClient,
+                dynamo,
+                ScanCommand,
+                PostToConnectionCommand,
+                DeleteCommand,
+                username,
+                cognitoId,
+            );
+
             // const sendConnectedMessageToEveryone = async () => {
             //     if (!scanResponse.Items) return;
             //     for (const connection of scanResponse.Items) {
@@ -148,17 +159,7 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
             try {
                 // await Promise.all(sendConnectedMessageToEveryone);
                 // await sendConnectedMessageToEveryone();
-
-                await websocketBroadcaster(
-                    process.env.CONNECTIONS_TABLE_NAME,
-                    APIGWClient,
-                    dynamo,
-                    ScanCommand,
-                    PostToConnectionCommand,
-                    DeleteCommand,
-                    username,
-                    cognitoId,
-                );
+                await broadCaster.broadcast('userConnected');
             } catch (error) {
                 console.log(error);
             }

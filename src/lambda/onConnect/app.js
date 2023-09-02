@@ -94,6 +94,7 @@ const connectHandler = async (event) => {
         try {
             const endpoint = 'https://' + event.requestContext.domainName + '/' + event.requestContext.stage;
             const APIGWClient = new client_apigatewaymanagementapi_1.ApiGatewayManagementApiClient({ region: 'eu-west-2', endpoint });
+            const broadCaster = new broadcastWebsocket_1.websocketBroadcaster(process.env.CONNECTIONS_TABLE_NAME, APIGWClient, dynamo, lib_dynamodb_1.ScanCommand, client_apigatewaymanagementapi_1.PostToConnectionCommand, lib_dynamodb_1.DeleteCommand, username, cognitoId);
             // const sendConnectedMessageToEveryone = async () => {
             //     if (!scanResponse.Items) return;
             //     for (const connection of scanResponse.Items) {
@@ -129,7 +130,7 @@ const connectHandler = async (event) => {
             try {
                 // await Promise.all(sendConnectedMessageToEveryone);
                 // await sendConnectedMessageToEveryone();
-                await (0, broadcastWebsocket_1.websocketBroadcaster)(process.env.CONNECTIONS_TABLE_NAME, APIGWClient, dynamo, lib_dynamodb_1.ScanCommand, client_apigatewaymanagementapi_1.PostToConnectionCommand, lib_dynamodb_1.DeleteCommand, username, cognitoId);
+                await broadCaster.broadcast('userConnected');
             }
             catch (error) {
                 console.log(error);
