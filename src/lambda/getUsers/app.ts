@@ -12,6 +12,7 @@ export const getUsersHandler = async (event: any, context: any, callback: any) =
             ExpressionAttributeNames: { '#onlineStatus': 'onlineStatus' },
             ExpressionAttributeValues: { ':onlineStatus': { S: 'online' } },
             FilterExpression: '#onlineStatus = :onlineStatus',
+            
         };
 
         const onlineUsers = await dynamo.send(new ScanCommand(params));

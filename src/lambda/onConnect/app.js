@@ -1,10 +1,29 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.connectHandler = void 0;
 // import { websocketBroadcaster } from '../../utils/nodejs/node_modules/broadcastWebsocket';
 // const websocketBroadcaster = require("broadcastWebsocket")
-// @ts-ignore
-const broadcastWebsocket_1 = require("/opt/nodejs/broadcastWebsocket");
+//@ts-ignore
+const websocketBroadcaster = __importStar(require("/opt/nodejs/broadcastWebsocket"));
 const client_dynamodb_1 = require("@aws-sdk/client-dynamodb");
 const lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
 const client_cognito_identity_provider_1 = require("@aws-sdk/client-cognito-identity-provider");
@@ -94,7 +113,7 @@ const connectHandler = async (event) => {
         try {
             const endpoint = 'https://' + event.requestContext.domainName + '/' + event.requestContext.stage;
             const APIGWClient = new client_apigatewaymanagementapi_1.ApiGatewayManagementApiClient({ region: 'eu-west-2', endpoint });
-            const broadCaster = new broadcastWebsocket_1.websocketBroadcaster(process.env.CONNECTIONS_TABLE_NAME, APIGWClient, dynamo, lib_dynamodb_1.ScanCommand, client_apigatewaymanagementapi_1.PostToConnectionCommand, lib_dynamodb_1.DeleteCommand, username, cognitoId);
+            const broadCaster = new websocketBroadcaster(process.env.CONNECTIONS_TABLE_NAME, APIGWClient, dynamo, lib_dynamodb_1.ScanCommand, client_apigatewaymanagementapi_1.PostToConnectionCommand, lib_dynamodb_1.DeleteCommand, username, cognitoId);
             // const sendConnectedMessageToEveryone = async () => {
             //     if (!scanResponse.Items) return;
             //     for (const connection of scanResponse.Items) {

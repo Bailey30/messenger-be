@@ -12,8 +12,6 @@ export const disconnectHandler = async (event: APIGatewayProxyEvent): Promise<AP
         TableName: process.env.CONNECTIONS_TABLE_NAME,
         Key: {
             connectionId: event.requestContext.connectionId,
-
-            
         },
     };
 

@@ -293,6 +293,31 @@ Resources:
             FunctionName: !Ref GetUsersFunction
             Principal: apigateway.amazonaws.com
 
+    GetConversationFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            CodeUri: src/lambda/getConversation
+            Handler: app.getConversation
+            Runtime: nodejs18.x
+            Role: !GetAtt FunctionRole.Arn
+            Environment:
+                Variables:
+                  CONVERSATIONS_TABLE_NAME: !Ref ConversationsTable
+            Policies:
+                - DynamoDBCrudPolicy:
+                  TableName: !Ref ConversationTable
+    GetConversationPermission:
+        Type: AWS::Lambda::Permission
+        DependsOn: 
+            - RestApi
+        Properties:
+            Action: lambda:InvokeFunction
+            FunctionName: !Ref GetConversationFunction
+            Principal: apigateway.amazonaws.com
+        
+
+    
+
     HelloWorldFunction:
         Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
         Properties:
@@ -349,6 +374,17 @@ Resources:
                   Projection:
                       ProjectionType: ALL
             BillingMode: PAY_PER_REQUEST
+    ConversationsTable:
+        Type: AWS::DynamoDB::Table
+        Properties:
+          AttributeDefinitions:
+            - AttributeName: conversationId
+              AttributeType: S  
+          KeySchema:
+            - AttributeName: conversationId
+              KeyType: HASH
+          BillingMode: PAY_PER_REQUEST
+        
 
     FunctionRole:
         Type: AWS::IAM::Role
