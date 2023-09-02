@@ -149,7 +149,7 @@ const connectHandler = async (event) => {
             try {
                 // await Promise.all(sendConnectedMessageToEveryone);
                 // await sendConnectedMessageToEveryone();
-                await broadCaster.broadcast('userConnected');
+                await websocketBroadcaster(process.env.CONNECTIONS_TABLE_NAME, APIGWClient, dynamo, lib_dynamodb_1.ScanCommand, client_apigatewaymanagementapi_1.PostToConnectionCommand, lib_dynamodb_1.DeleteCommand, username, cognitoId);
             }
             catch (error) {
                 console.log(error);

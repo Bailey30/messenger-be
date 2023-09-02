@@ -18,7 +18,7 @@ const getUsersHandler = async (event, context, callback) => {
         console.log({ onlineUsers });
         const formattedUsers = onlineUsers?.Items?.map((user) => {
             return {
-                cognitoid: user.cognitoid.S,
+                cognitoId: user.cognitoid.S,
                 onlineStatus: user.onlineStatus.S,
                 username: user.username.S,
             };

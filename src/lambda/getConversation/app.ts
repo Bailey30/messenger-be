@@ -83,6 +83,11 @@ export const getConversation = async (event: any, context: any, callback: any) =
         callback('Internal Server Error', {
             statusCode: 500,
             body: JSON.stringify({ error: 'Internal Server Error' }),
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
+                'Access-Control-Allow-Headers': 'Content-Type',
+            },
         });
     }
 };

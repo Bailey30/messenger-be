@@ -1,8 +1,7 @@
-
 // import { websocketBroadcaster } from '../../utils/nodejs/node_modules/broadcastWebsocket';
 // const websocketBroadcaster = require("broadcastWebsocket")
 //@ts-ignore
-import * as  websocketBroadcaster from "/opt/nodejs/broadcastWebsocket"
+import * as websocketBroadcaster from '/opt/nodejs/broadcastWebsocket';
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { DynamoDBClient, BatchExecuteStatementCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
@@ -160,7 +159,17 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
             try {
                 // await Promise.all(sendConnectedMessageToEveryone);
                 // await sendConnectedMessageToEveryone();
-                await broadCaster.broadcast('userConnected');
+
+                await websocketBroadcaster(
+                    process.env.CONNECTIONS_TABLE_NAME,
+                    APIGWClient,
+                    dynamo,
+                    ScanCommand,
+                    PostToConnectionCommand,
+                    DeleteCommand,
+                    username,
+                    cognitoId,
+                );
             } catch (error) {
                 console.log(error);
             }
