@@ -154,7 +154,7 @@ Resources:
             ApiId: !Ref RestApi
             RouteKey: GET /getConversation
             AuthorizationType: NONE
-            OperationName: GetConversationName
+            OperationName: GetConversationRoute
             Target: !Join 
                 - "/"
                 - - "integrations"
