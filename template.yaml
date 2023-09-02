@@ -152,7 +152,7 @@ Resources:
         Type: AWS::ApiGatewayV2::Route
         Properties:
             ApiId: !Ref RestApi
-            RouteKey: PUT /getConversation
+            RouteKey: POST /getConversation
             AuthorizationType: NONE
             OperationName: GetConversationRoute
             Target: !Join 
