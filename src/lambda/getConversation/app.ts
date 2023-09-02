@@ -11,5 +11,15 @@ export const getConversation = async (event: any, context: any, callback: any) =
 
     // if conversation doesnt exists, create new conversation
 
+    callback(null, {
+        statusCode: 200,
+        body: JSON.stringify(event),
+        headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
+            'Access-Control-Allow-Headers': 'Content-Type',
+        },
+    });
+
 
 }

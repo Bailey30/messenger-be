@@ -9,5 +9,14 @@ const getConversation = async (event, context, callback) => {
     console.log(event);
     // take cognitoid of both users and search database for conversation that has those ids
     // if conversation doesnt exists, create new conversation
+    callback(null, {
+        statusCode: 200,
+        body: JSON.stringify(event),
+        headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
+            'Access-Control-Allow-Headers': 'Content-Type',
+        },
+    });
 };
 exports.getConversation = getConversation;
