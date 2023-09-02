@@ -5,6 +5,8 @@ const client = new DynamoDBClient({ region: 'eu-west-2' });
 const dynamo = DynamoDBDocumentClient.from(client);
 
 export const getConversation = async (event: any, context: any, callback: any) => {
+    console.log(event)
+
     // take cognitoid of both users and search database for conversation that has those ids
 
     // if conversation doesnt exists, create new conversation

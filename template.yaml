@@ -148,6 +148,27 @@ Resources:
             IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetUsersFunction.Arn}/invocations
             PayloadFormatVersion: "1.0"
 
+    GetConversationRoute:
+        Type: AWS::ApiGatewayV2::Route
+        Properties:
+            ApiId: !Ref RestApi
+            RouteKey: GET /getConversation
+            AuthorizationType: NONE
+            OperationName: GetConversationName
+            Target: !Join 
+                - "/"
+                - - "integrations"
+                  - !Ref GetConversationInteg
+    GetConversationInteg:
+        Type: AWS::ApiGatewayV2::Integration
+        Properties:
+            ApiId: !Ref RestApi
+            IntegrationType: AWS_PROXY
+            IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetConversationFunction.Arn}/invocations
+            PayloadFormatVersion: "1.0"
+
+
+
     # FUNCTIONS AND PERMISSIONS
     OnConnectFunction:
         Type: AWS::Serverless::Function
@@ -456,6 +477,9 @@ Outputs:
     GetUsersEndpoint:
         Description: Get Users API endpoint URL
         Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/dev/getUsers"
+    GetConversationEndPoint:
+        Description: Get Conversation API endpoint
+        Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/dev/getConversation"
     OnConnectFunctionArn:
         Description: "OnConnect function ARN"
         Value: !GetAtt OnConnectFunction.Arn
