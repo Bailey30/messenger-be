@@ -6,11 +6,9 @@ const dynamo = DynamoDBDocumentClient.from(client);
 
 import { v4 as uuidv4 } from 'uuid';
 
-const conversationTableName = process.env.CONVERSATION_TABLE_NAME;
-
 const scanForConversation = async (userCognitoId: string, selectedUserCognitoId: string) => {
     const scanParams = {
-        TableName: conversationTableName,
+        TableName: process.env.CONVERSATIONS_TABLE_NAME,
         filterExpression: 'contains(participants, :userId) AND contains(participants, :selectedUserId)',
         ExpressionAttributeValues: {
             ':userId': { S: userCognitoId },
@@ -36,7 +34,7 @@ const scanForConversation = async (userCognitoId: string, selectedUserCognitoId:
 
 const createConversation = async (userCognitoId: string, selectedUserCognitoId: string, newConversationId: string) => {
     const putParams = {
-        TableName: conversationTableName,
+        TableName: process.env.CONVERSATIONS_TABLE_NAME,
         Item: {
             conversationId: newConversationId,
             participants: [userCognitoId, selectedUserCognitoId],

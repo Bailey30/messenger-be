@@ -6,10 +6,9 @@ const lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
 const client = new client_dynamodb_1.DynamoDBClient({ region: 'eu-west-2' });
 const dynamo = lib_dynamodb_1.DynamoDBDocumentClient.from(client);
 const uuid_1 = require("uuid");
-const conversationTableName = process.env.CONVERSATION_TABLE_NAME;
 const scanForConversation = async (userCognitoId, selectedUserCognitoId) => {
     const scanParams = {
-        TableName: conversationTableName,
+        TableName: process.env.CONVERSATIONS_TABLE_NAME,
         filterExpression: 'contains(participants, :userId) AND contains(participants, :selectedUserId)',
         ExpressionAttributeValues: {
             ':userId': { S: userCognitoId },
@@ -33,7 +32,7 @@ const scanForConversation = async (userCognitoId, selectedUserCognitoId) => {
 };
 const createConversation = async (userCognitoId, selectedUserCognitoId, newConversationId) => {
     const putParams = {
-        TableName: conversationTableName,
+        TableName: process.env.CONVERSATIONS_TABLE_NAME,
         Item: {
             conversationId: newConversationId,
             participants: [userCognitoId, selectedUserCognitoId],
