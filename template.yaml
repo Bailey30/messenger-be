@@ -458,7 +458,7 @@ Resources:
                   KeyType: HASH
                 - AttributeName: timestamp
                   KeyType: RANGE   
-        
+            BillingMode: PAY_PER_REQUEST
         
 
     FunctionRole:
