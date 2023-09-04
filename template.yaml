@@ -167,6 +167,24 @@ Resources:
             IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetConversationFunction.Arn}/invocations
             PayloadFormatVersion: "1.0"
 
+    # NewMessageRoute:
+    #     Type: AWS::ApiGatewayV2::Route
+    #     Properties:
+    #         ApiId: !Ref RestApi
+    #         RouteKey: POST /newmessage
+    #         AuthorizationType: NONE
+    #         OperationName: newMessageRoute
+    #         Target: !Join 
+    #             - "/"
+    #             - - "integrations"
+    #               - !Ref newMessageInteg
+    # NewMessageInteg:
+    #     Type: AWS::ApiGatewayV2::Integration
+    #     Properties:
+    #         ApiId: !Ref RestApi
+    #         IntegrationType: AWS_PROXY
+    #         IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NewMessageFunction.Arn}/invocations
+    #         PayloadFormatVersion: "1.0"
 
 
     # FUNCTIONS AND PERMISSIONS
@@ -335,7 +353,29 @@ Resources:
             Action: lambda:InvokeFunction
             FunctionName: !Ref GetConversationFunction
             Principal: apigateway.amazonaws.com
-        
+    
+    # NewMessageFunction:
+    #     Type: AWS::Serverless::Function
+    #     Properties:
+    #         CodeUri: src/lambda/newMessage
+    #         Handler: app.newMessage
+    #         Runtime: nodejs18.x
+    #         Environment:
+    #             Variables:
+    #               MESSAGES_TABLE_NAME: !Ref MessagesTable
+    #         Policies:
+    #             - DynamoDBCrudPolicy:
+    #               TableName: !Ref MessagesTable
+    # NewMessagePermission:
+    #     Type: AWS::Lambda::Permission
+    #     DependsOn: 
+    #         - RestApi
+    #     Properties:
+    #         Action: lambdaInvokeFunction
+    #         FunctionName: !Ref NewMessageFunction
+    #         Principal: apigateway.amazonaws.com
+
+          
 
     
 
@@ -405,6 +445,20 @@ Resources:
             - AttributeName: conversationId
               KeyType: HASH
           BillingMode: PAY_PER_REQUEST
+    MessagesTable:
+        Type: AWS::DynamoDB::Table
+        Properties:
+            AttributeDefinitions:
+              - AttributeName: conversationId
+                AttributeType: S
+              - AttributeName: timestamp
+                AttributeType: S
+            KeySchema:
+                - AttributeName: conversationId
+                  KeyType: HASH
+                - AttributeName: timestamp
+                  KeyType: RANGE   
+        
         
 
     FunctionRole:
@@ -486,6 +540,10 @@ Outputs:
     GetUsersFunctionArn:
         Description: Get Users Function ARN
         Value: !GetAtt GetUsersFunction.Arn
+    SendMessageFunction:
+        Description: Send Message Function ARN
+        Value: !GetAtt SendMessageFunction.Arn
+
     UserPoolId:
         Description: Messenger userpool ID
         Value: !Ref UserPool
