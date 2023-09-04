@@ -18,7 +18,6 @@ const scanForConversation = async (userCognitoId, selectedUserCognitoId) => {
         },
         ProjectionExpression: 'conversationId',
     };
-    // comment for push
     const existingConversation = await dynamo.send(new client_dynamodb_1.ScanCommand(scanParams));
     console.log({ existingConversation });
     // Check if the Items array exists and has at least one item

@@ -19,8 +19,6 @@ const scanForConversation = async (userCognitoId: string, selectedUserCognitoId:
         ProjectionExpression: 'conversationId',
     };
 
-    // comment for push
-
     const existingConversation = await dynamo.send(new ScanCommand(scanParams));
     console.log({ existingConversation });
 
