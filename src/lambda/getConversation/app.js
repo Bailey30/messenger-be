@@ -9,7 +9,7 @@ const uuid_1 = require("uuid");
 const scanForConversation = async (userCognitoId, selectedUserCognitoId) => {
     const scanParams = {
         TableName: process.env.CONVERSATIONS_TABLE_NAME,
-        filterExpression: 'contains(participants, :userId) AND contains(participants, :selectedUserId)',
+        FilterExpression: 'contains(participants, :userId) AND contains(participants, :selectedUserId)',
         ExpressionAttributeValues: {
             ':userId': { S: userCognitoId },
             ':selectedUserId': {

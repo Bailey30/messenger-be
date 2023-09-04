@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 const scanForConversation = async (userCognitoId: string, selectedUserCognitoId: string) => {
     const scanParams = {
         TableName: process.env.CONVERSATIONS_TABLE_NAME,
-        filterExpression: 'contains(participants, :userId) AND contains(participants, :selectedUserId)',
+        FilterExpression: 'contains(participants, :userId) AND contains(participants, :selectedUserId)',
         ExpressionAttributeValues: {
             ':userId': { S: userCognitoId },
             ':selectedUserId': {
