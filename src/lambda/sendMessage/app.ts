@@ -1,64 +1,104 @@
-import { DynamoDBClient, ScanCommand } from '@aws-sdk/client-dynamodb';
-import { DeleteCommand, DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
+import { AttributeValue, DynamoDBClient, ScanCommand } from '@aws-sdk/client-dynamodb';
+import { DeleteCommand, DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
 
 const client = new DynamoDBClient({ region: 'eu-west-2' });
 const dynamo = DynamoDBDocumentClient.from(client);
 
 import { PostToConnectionCommand, ApiGatewayManagementApiClient } from '@aws-sdk/client-apigatewaymanagementapi';
 
+async function getConnectionId(cognitoId: string): Promise<string | null> {
+    // Retrieve connectionIds from the connections table
+    try {
+        const params = {
+            TableName: process.env.CONNECTIONS_TABLE_NAME,
+            IndexName: 'cognitoid-index', // Name of the global secondary index
+            KeyConditionExpression: 'cognitoid = :cognitoId',
+            ExpressionAttributeValues: {
+                ':cognitoId': { S: cognitoId }, // Convert to DynamoDB AttributeValue format
+            },
+        };
+        const scanResponse = await dynamo.send(new ScanCommand(params));
+        // Check if any items were found
+        if (scanResponse.Items && scanResponse.Items.length > 0 && scanResponse.Items[0].connectionId.S) {
+            const connectionId = scanResponse.Items[0].connectionId.S;
+            console.log('Connection ID:', connectionId);
+            return connectionId;
+        } else {
+            console.log('No matching records found for the cognito ID:', cognitoId);
+            return null;
+        }
+    } catch (error: any) {
+        console.error('Error querying DynamoDB:', error);
+        throw new Error(error);
+    }
+}
+
+async function addMessageToDB(
+    conversationId: string,
+    createdAt: string,
+    senderId: string,
+    receiverId: string,
+    content: string,
+) {
+    try {
+        const putParams = {
+            TableName: process.env.MESSAGES_TABLE_NAME,
+            Item: {
+                conversationId: conversationId,
+                timestamp: createdAt,
+                senderId: senderId,
+                receiverId: receiverId,
+                content: content,
+            },
+        };
+
+        await dynamo.send(new PutCommand(putParams));
+    } catch (error: any) {
+        console.error('error adding message to db:', error);
+        throw new Error(error);
+    }
+}
+
 export const sendMessageHandler = async (event: any, context: any, callback: any) => {
     try {
         console.log({ event });
-        // Retrieve connectionIds from the connections table
-        // const params = {
-        //     TableName: process.env.CONNECTIONS_TABLE_NAME,
-        //     IndexName: 'cognitoid-index', // Name of the global secondary index
-        //     KeyConditionExpression: 'cognitoid = :cognitoId',
-        //     ExpressionAttributeValues: {
-        //         ':cognitoId': cognitoId,
-        //     },
-        // };
+        const { content, conversationId, createdAt, senderId, receiverId } = JSON.parse(event.body.data);
 
-        // try {
-        //     const scanResponse = await dynamo.send(new ScanCommand(params));
-        //     // Check if any items were found
-        //     if (scanResponse.Items && scanResponse.Items.length > 0) {
-        //         // Extract the connection ID from the first item (assuming unique cognito IDs)
-        //         const connectionId = scanResponse.Items[0].connectionId;
-        //         console.log('Connection ID:', connectionId);
-        //     } else {
-        //         console.log('No matching records found for the cognito ID:', cognitoId);
-        //     }
-        // } catch (error) {
-        //     console.error('Error querying DynamoDB:', error);
-        // }
+        const connectionId = await getConnectionId(receiverId);
+        await addMessageToDB(conversationId, createdAt, senderId, receiverId, content);
 
-        // // Get the API endpoint
-        // const endpoint = event.requestContext.domainName + '/' + event.requestContext.stage;
-        // console.log({ endpoint });
+        const APIGWClient = new ApiGatewayManagementApiClient({
+            region: 'eu-west-2',
+            endpoint: event.requestContext.domainName + '/' + event.requestContext.stage,
+        });
 
-        // // Create an instance of the API Gateway Management API
+        const messageData = {
+            content,
+            conversationId,
+            createdAt,
+            senderId,
+            receiverId,
+        };
 
-        // const APIGWClient = new ApiGatewayManagementApiClient({
-        //     region: 'eu-west-2',
-        //     endpoint: event.requestContext.domainName + '/' + event.requestContext.stage,
-        // });
+        if (connectionId) {
+            try {
+                await APIGWClient.send(
+                    new PostToConnectionCommand({ ConnectionId: connectionId, Data: JSON.stringify(messageData) }),
+                );
+            } catch (e: any) {
+                // If the connection is stale, delete it from the table
+                if (e.statusCode === 410) {
+                    console.log(`Found stale connection, deleting ${connectionId}`);
+                    await dynamo.send(
+                        new DeleteCommand({ TableName: process.env.CONNECTIONS_TABLE_NAME, Key: { connectionId } }),
+                    );
+                    throw e;
+                }
+            }
+        } else {
+            throw new Error('no connection id, cannot post to connection');
+        }
 
-        // // Send messages to each connectionId retrieved from the table
-        // try {
-        //     await APIGWClient.send(new PostToConnectionCommand({ ConnectionId: connectionId, Data: 'hello' }));
-        // } catch (e: any) {
-        //     // If the connection is stale, delete it from the table
-        //     if (e.statusCode === 410) {
-        //         console.log(`Found stale connection, deleting ${connectionId}`);
-        //         await dynamo.send(
-        //             new DeleteCommand({ TableName: process.env.CONNECTIONS_TABLE_NAME, Key: { connectionId } }),
-        //         );
-        //         throw e;
-        //     }
-        // }
-
-        // Return a success response
         return { statusCode: 200, body: 'Data sent.' };
     } catch (error) {
         return { statusCode: 500, body: 'error sending message' };
