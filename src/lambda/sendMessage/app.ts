@@ -6,6 +6,7 @@ const dynamo = DynamoDBDocumentClient.from(client);
 
 const AWS = require('aws-sdk');
 export const sendMessageHandler = async (event: any, context: any, callback: any) => {
+    console.log({ event });
     // Retrieve connectionIds from the connections table
     const params = {
         TableName: process.env.CONNECTIONS_TABLE_NAME,
@@ -22,7 +23,7 @@ export const sendMessageHandler = async (event: any, context: any, callback: any
         apiVersion: '2018-11-29',
         endpoint: event.requestContext.domainName + '/' + event.requestContext.stage,
     });
-    
+
     // Send messages to each connectionId retrieved from the table
     const postCalls = scanResponse?.Items?.map(async ({ connectionId }) => {
         try {

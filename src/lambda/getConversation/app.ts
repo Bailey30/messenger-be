@@ -25,7 +25,7 @@ const scanForConversation = async (userCognitoId: string, selectedUserCognitoId:
     // Check if the Items array exists and has at least one item
     if (existingConversation.Items && existingConversation.Items.length > 0) {
         // Return the first item from the array
-        return existingConversation.Items[0];
+        return existingConversation.Items[0].conversationId.S;
     } else {
         // Return null or an appropriate value if no items are found
         return null;

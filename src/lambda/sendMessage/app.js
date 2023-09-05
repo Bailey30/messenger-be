@@ -7,6 +7,7 @@ const client = new client_dynamodb_1.DynamoDBClient({ region: 'eu-west-2' });
 const dynamo = lib_dynamodb_1.DynamoDBDocumentClient.from(client);
 const AWS = require('aws-sdk');
 const sendMessageHandler = async (event, context, callback) => {
+    console.log({ event });
     // Retrieve connectionIds from the connections table
     const params = {
         TableName: process.env.CONNECTIONS_TABLE_NAME,

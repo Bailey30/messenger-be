@@ -282,9 +282,19 @@ Resources:
             Environment:
                 Variables:
                     CONNECTIONS_TABLE_NAME: !Ref ConnectionsTable
+                    MESSAGES_TABLE_NAME: !Ref MessagesTable
             Policies:
                 - DynamoDBCrudPolicy:
                       TableName: !Ref ConnectionsTable
+                - DynamoDBCrudPolicy:
+                      TableName: !Ref MessagesTab
+                - Statement:
+                    - Effect: Allow
+                      Action:
+                      - 'execute-api:ManageConnections'
+                      Resource:
+                      - !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebSocketApiGateway}/*' 
+            
     SendMessagePermissions:
         Type: AWS::Lambda::Permission
         DependsOn:
