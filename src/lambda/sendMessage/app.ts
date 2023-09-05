@@ -8,6 +8,7 @@ import { PostToConnectionCommand, ApiGatewayManagementApiClient } from '@aws-sdk
 
 async function getConnectionId(cognitoId: string): Promise<string | null> {
     // Retrieve connectionIds from the connections table
+    console.log('getting connectionId');
     try {
         const params = {
             TableName: process.env.CONNECTIONS_TABLE_NAME,
@@ -18,6 +19,7 @@ async function getConnectionId(cognitoId: string): Promise<string | null> {
             },
         };
         const scanResponse = await dynamo.send(new ScanCommand(params));
+        console.log({ scanResponse });
         // Check if any items were found
         if (scanResponse.Items && scanResponse.Items.length > 0 && scanResponse.Items[0].connectionId.S) {
             const connectionId = scanResponse.Items[0].connectionId.S;
@@ -85,6 +87,7 @@ export const sendMessageHandler = async (event: any, context: any, callback: any
                 await APIGWClient.send(
                     new PostToConnectionCommand({ ConnectionId: connectionId, Data: JSON.stringify(messageData) }),
                 );
+                console.log('message sent to:', connectionId, messageData);
             } catch (e: any) {
                 // If the connection is stale, delete it from the table
                 if (e.statusCode === 410) {

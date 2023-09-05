@@ -8,6 +8,7 @@ const dynamo = lib_dynamodb_1.DynamoDBDocumentClient.from(client);
 const client_apigatewaymanagementapi_1 = require("@aws-sdk/client-apigatewaymanagementapi");
 async function getConnectionId(cognitoId) {
     // Retrieve connectionIds from the connections table
+    console.log('getting connectionId');
     try {
         const params = {
             TableName: process.env.CONNECTIONS_TABLE_NAME,
@@ -18,6 +19,7 @@ async function getConnectionId(cognitoId) {
             },
         };
         const scanResponse = await dynamo.send(new client_dynamodb_1.ScanCommand(params));
+        console.log({ scanResponse });
         // Check if any items were found
         if (scanResponse.Items && scanResponse.Items.length > 0 && scanResponse.Items[0].connectionId.S) {
             const connectionId = scanResponse.Items[0].connectionId.S;
@@ -73,6 +75,7 @@ const sendMessageHandler = async (event, context, callback) => {
         if (connectionId) {
             try {
                 await APIGWClient.send(new client_apigatewaymanagementapi_1.PostToConnectionCommand({ ConnectionId: connectionId, Data: JSON.stringify(messageData) }));
+                console.log('message sent to:', connectionId, messageData);
             }
             catch (e) {
                 // If the connection is stale, delete it from the table
