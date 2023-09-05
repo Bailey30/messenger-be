@@ -49,6 +49,7 @@ const addMessageToDB = async (conversationId, createdAt, senderId, receiverId, c
             },
         };
         await dynamo.send(new lib_dynamodb_1.PutCommand(putParams));
+        return;
     }
     catch (error) {
         console.error('error adding message to db:', error);
@@ -57,8 +58,16 @@ const addMessageToDB = async (conversationId, createdAt, senderId, receiverId, c
 };
 const sendMessageHandler = async (event) => {
     try {
-        const { content, conversationId, createdAt, senderId, receiverId } = JSON.parse(event.body.data);
         console.log({ event });
+        console.log(event.body);
+        // const { content, conversationId, createdAt, senderId, receiverId } = JSON.parse(event.body.data);
+        const data = JSON.parse(event.body.data);
+        console.log({ data });
+        const content = data.content;
+        const conversationId = data.conversationId;
+        const createdAt = data.createdAt;
+        const senderId = data.senderId;
+        const receiverId = data.receiverId;
         const connectionId = await getConnectionId(receiverId);
         await addMessageToDB(conversationId, createdAt, senderId, receiverId, content);
         const APIGWClient = new client_apigatewaymanagementapi_1.ApiGatewayManagementApiClient({
