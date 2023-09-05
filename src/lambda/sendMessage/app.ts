@@ -6,7 +6,7 @@ const dynamo = DynamoDBDocumentClient.from(client);
 
 import { PostToConnectionCommand, ApiGatewayManagementApiClient } from '@aws-sdk/client-apigatewaymanagementapi';
 
-async function getConnectionId(cognitoId: string): Promise<string | null> {
+const getConnectionId = async (cognitoId: string): Promise<string | null> => {
     // Retrieve connectionIds from the connections table
     console.log('getting connectionId');
     try {
@@ -33,15 +33,15 @@ async function getConnectionId(cognitoId: string): Promise<string | null> {
         console.error('Error querying DynamoDB:', error);
         throw new Error(error);
     }
-}
+};
 
-async function addMessageToDB(
+const addMessageToDB = async (
     conversationId: string,
     createdAt: string,
     senderId: string,
     receiverId: string,
     content: string,
-) {
+) => {
     try {
         const putParams = {
             TableName: process.env.MESSAGES_TABLE_NAME,
@@ -59,7 +59,7 @@ async function addMessageToDB(
         console.error('error adding message to db:', error);
         throw new Error(error);
     }
-}
+};
 
 export const sendMessageHandler = async (event: any, context: any, callback: any) => {
     try {
@@ -75,6 +75,7 @@ export const sendMessageHandler = async (event: any, context: any, callback: any
         });
 
         const messageData = {
+            type: 'messageReceived',
             content,
             conversationId,
             createdAt,

@@ -95,38 +95,6 @@ const connectHandler = async (event) => {
             const endpoint = 'https://' + event.requestContext.domainName + '/' + event.requestContext.stage;
             const APIGWClient = new client_apigatewaymanagementapi_1.ApiGatewayManagementApiClient({ region: 'eu-west-2', endpoint });
             const broadCaster = new broadcastWebsocket_1.websocketBroadcaster(process.env.CONNECTIONS_TABLE_NAME, APIGWClient, dynamo, lib_dynamodb_1.ScanCommand, client_apigatewaymanagementapi_1.PostToConnectionCommand, lib_dynamodb_1.DeleteCommand, username, cognitoId);
-            // const sendConnectedMessageToEveryone = async () => {
-            //     if (!scanResponse.Items) return;
-            //     for (const connection of scanResponse.Items) {
-            //         const connectionId = connection.connectionId;
-            //         const data = JSON.stringify({
-            //             type: 'userConnected',
-            //             username,
-            //             cognitoId,
-            //         });
-            //         try {
-            //             const response = await APIGWClient.send(
-            //                 new PostToConnectionCommand({
-            //                     ConnectionId: connectionId,
-            //                     Data: data,
-            //                 }),
-            //             );
-            //             console.log({ response });
-            //         } catch (e: any) {
-            //             if (e.statusCode === 410) {
-            //                 console.log(`Found stale connection, deleting ${connectionId}`);
-            //                 await dynamo.send(
-            //                     new DeleteCommand({
-            //                         TableName: process.env.CONNECTIONS_TABLE_NAME,
-            //                         Key: { connectionId },
-            //                     }),
-            //                 );
-            //                 throw e;
-            //             }
-            //             console.log({ e });
-            //         }
-            //     }
-            // };
             try {
                 // await Promise.all(sendConnectedMessageToEveryone);
                 // await sendConnectedMessageToEveryone();

@@ -6,7 +6,7 @@ const lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
 const client = new client_dynamodb_1.DynamoDBClient({ region: 'eu-west-2' });
 const dynamo = lib_dynamodb_1.DynamoDBDocumentClient.from(client);
 const client_apigatewaymanagementapi_1 = require("@aws-sdk/client-apigatewaymanagementapi");
-async function getConnectionId(cognitoId) {
+const getConnectionId = async (cognitoId) => {
     // Retrieve connectionIds from the connections table
     console.log('getting connectionId');
     try {
@@ -35,8 +35,8 @@ async function getConnectionId(cognitoId) {
         console.error('Error querying DynamoDB:', error);
         throw new Error(error);
     }
-}
-async function addMessageToDB(conversationId, createdAt, senderId, receiverId, content) {
+};
+const addMessageToDB = async (conversationId, createdAt, senderId, receiverId, content) => {
     try {
         const putParams = {
             TableName: process.env.MESSAGES_TABLE_NAME,
@@ -54,7 +54,7 @@ async function addMessageToDB(conversationId, createdAt, senderId, receiverId, c
         console.error('error adding message to db:', error);
         throw new Error(error);
     }
-}
+};
 const sendMessageHandler = async (event, context, callback) => {
     try {
         console.log({ event });
@@ -66,6 +66,7 @@ const sendMessageHandler = async (event, context, callback) => {
             endpoint: event.requestContext.domainName + '/' + event.requestContext.stage,
         });
         const messageData = {
+            type: 'messageReceived',
             content,
             conversationId,
             createdAt,
