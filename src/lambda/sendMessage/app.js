@@ -18,7 +18,7 @@ const getConnectionId = async (cognitoId) => {
                 ':cognitoId': { S: cognitoId }, // Convert to DynamoDB AttributeValue format
             },
         };
-        const scanResponse = await dynamo.send(new client_dynamodb_1.ScanCommand(params));
+        const scanResponse = await dynamo.send(new client_dynamodb_1.QueryCommand(params));
         console.log({ scanResponse });
         // Check if any items were found
         if (scanResponse.Items && scanResponse.Items.length > 0 && scanResponse.Items[0].connectionId.S) {

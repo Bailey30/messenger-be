@@ -1,4 +1,4 @@
-import { AttributeValue, DynamoDBClient, ScanCommand } from '@aws-sdk/client-dynamodb';
+import { AttributeValue, DynamoDBClient, QueryCommand, ScanCommand } from '@aws-sdk/client-dynamodb';
 import { DeleteCommand, DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
 
 const client = new DynamoDBClient({ region: 'eu-west-2' });
@@ -19,7 +19,7 @@ const getConnectionId = async (cognitoId: string): Promise<string | null> => {
                 ':cognitoId': { S: cognitoId }, // Convert to DynamoDB AttributeValue format
             },
         };
-        const scanResponse = await dynamo.send(new ScanCommand(params));
+        const scanResponse = await dynamo.send(new QueryCommand(params));
         console.log({ scanResponse });
         // Check if any items were found
         if (scanResponse.Items && scanResponse.Items.length > 0 && scanResponse.Items[0].connectionId.S) {
