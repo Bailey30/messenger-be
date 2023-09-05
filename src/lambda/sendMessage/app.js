@@ -60,14 +60,14 @@ const sendMessageHandler = async (event) => {
     try {
         console.log({ event });
         console.log(event.body);
-        // const { content, conversationId, createdAt, senderId, receiverId } = JSON.parse(event.body.data);
-        const data = JSON.parse(event.body.data);
-        console.log({ data });
-        const content = data.content;
-        const conversationId = data.conversationId;
-        const createdAt = data.createdAt;
-        const senderId = data.senderId;
-        const receiverId = data.receiverId;
+        const body = JSON.parse(event.body);
+        const { content, conversationId, createdAt, senderId, receiverId } = body.data;
+        // console.log({ data });
+        // const content = data.content;
+        // const conversationId = data.conversationId;
+        // const createdAt = data.createdAt;
+        // const senderId = data.senderId;
+        // const receiverId = data.receiverId;
         const connectionId = await getConnectionId(receiverId);
         await addMessageToDB(conversationId, createdAt, senderId, receiverId, content);
         const APIGWClient = new client_apigatewaymanagementapi_1.ApiGatewayManagementApiClient({
