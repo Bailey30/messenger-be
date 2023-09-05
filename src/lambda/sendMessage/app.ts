@@ -5,6 +5,7 @@ const client = new DynamoDBClient({ region: 'eu-west-2' });
 const dynamo = DynamoDBDocumentClient.from(client);
 
 import { PostToConnectionCommand, ApiGatewayManagementApiClient } from '@aws-sdk/client-apigatewaymanagementapi';
+import { APIGatewayProxyEvent } from 'aws-lambda';
 
 const getConnectionId = async (cognitoId: string): Promise<string | null> => {
     // Retrieve connectionIds from the connections table
@@ -61,10 +62,10 @@ const addMessageToDB = async (
     }
 };
 
-export const sendMessageHandler = async (event: any, context: any, callback: any) => {
+export const sendMessageHandler = async (event: any) => {
     try {
-        console.log({ event });
         const { content, conversationId, createdAt, senderId, receiverId } = JSON.parse(event.body.data);
+        console.log({ event });
 
         const connectionId = await getConnectionId(receiverId);
         await addMessageToDB(conversationId, createdAt, senderId, receiverId, content);

@@ -55,10 +55,10 @@ const addMessageToDB = async (conversationId, createdAt, senderId, receiverId, c
         throw new Error(error);
     }
 };
-const sendMessageHandler = async (event, context, callback) => {
+const sendMessageHandler = async (event) => {
     try {
-        console.log({ event });
         const { content, conversationId, createdAt, senderId, receiverId } = JSON.parse(event.body.data);
+        console.log({ event });
         const connectionId = await getConnectionId(receiverId);
         await addMessageToDB(conversationId, createdAt, senderId, receiverId, content);
         const APIGWClient = new client_apigatewaymanagementapi_1.ApiGatewayManagementApiClient({
