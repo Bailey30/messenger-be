@@ -282,14 +282,14 @@ Resources:
             Handler: app.customVerificationEmailHandler
             Runtime: nodejs18.x
             Role: !GetAtt FunctionRole.Arn
-        Metadata: # Manage esbuild properties
-          BuildMethod: esbuild
-          BuildProperties:
-            Minify: true
-            Target: es2020
-            Sourcemap: true
-            EntryPoints:
-             - app.ts
+        # Metadata: # Manage esbuild properties
+        #   BuildMethod: esbuild
+        #   BuildProperties:
+        #     Minify: true
+        #     Target: es2020
+        #     Sourcemap: true
+        #     EntryPoints:
+        #      - app.ts
     CustomVerificationEmailPermissions:
         Type: AWS::Lambda::Permission
         DependsOn:
