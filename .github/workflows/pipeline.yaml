@@ -135,6 +135,7 @@ jobs:
 
             - run: sam build --template ${SAM_TEMPLATE} --use-container
 
+
             - name: Assume the testing pipeline user role
               uses: aws-actions/configure-aws-credentials@v4
               with:
