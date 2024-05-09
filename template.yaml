@@ -31,6 +31,7 @@ Resources:
                   Required: true
             LambdaConfig:
                 PostConfirmation: !GetAtt PostConfirmationFunction.Arn
+                CustomMessage: !GetAtt CustomVerificationEmailFunction.Arn
     UserPoolClient:
         Type: AWS::Cognito::UserPoolClient
         Properties:
@@ -270,6 +271,31 @@ Resources:
         Properties:
             Action: lambda:InvokeFunction
             FunctionName: !Ref PostConfirmationFunction
+            Principal: cognito-idp.amazonaws.com
+
+    # Function that sends a custom verification email after the user signs up
+    CustomVerificationEmailFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            CodeUri: src/lambda/customVerificationEmail
+            Handler: app.customVerificationEmailHandler
+            Runtime: nodejs18.x
+            Role: !GetAtt FunctionRole.Arn
+        Metadata: # Manage esbuild properties
+          BuildMethod: esbuild
+          BuildProperties:
+            Minify: true
+            Target: es2020
+            Sourcemap: true
+            EntryPoints:
+             - app.ts
+    CustomVerificationEmailPermissions:
+        Type: AWS::Lambda::Permission
+        DependsOn:
+            - ServerlessRestApi
+        Properties:
+            Action: lambda:InvokeFunction
+            FunctionName: !Ref CustomVerificationEmailFunction
             Principal: cognito-idp.amazonaws.com
 
     SendMessageFunction:
@@ -563,3 +589,6 @@ Outputs:
     PostConfirmationFunction:
         Description: Function that runs after the confirmation step of cognito sign up
         Value: !Ref PostConfirmationFunction
+    CustomVerificationEmailFunction:
+        Description: Function that sends custom verification email with link including code
+        Value: !Ref CustomVerificationEmailFunction

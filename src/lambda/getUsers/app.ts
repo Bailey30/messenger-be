@@ -3,6 +3,7 @@ import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 
 const client = new DynamoDBClient({ region: 'eu-west-2' });
 const dynamo = DynamoDBDocumentClient.from(client);
+
 export const getUsersHandler = async (event: any, context: any, callback: any) => {
     console.log('EVENT', event);
 
