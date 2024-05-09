@@ -130,6 +130,7 @@ Resources:
             Name: !Sub "${AWS::StackName}-MessengerRestApi"
             ProtocolType: HTTP
 
+
     GetUsersRoute:
         Type: AWS::ApiGatewayV2::Route
         Properties:
