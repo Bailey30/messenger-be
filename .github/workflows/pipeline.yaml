@@ -88,6 +88,12 @@ jobs:
             - uses: aws-actions/setup-sam@v2
               with:
                   use-installer: true
+            - run: |
+                cd src
+                npm install
+                npm install -g esbuild
+
+
             - run: sam build --template ${SAM_TEMPLATE} --use-container
 
             - name: Assume the testing pipeline user role
