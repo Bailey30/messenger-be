@@ -80,6 +80,7 @@ Resources:
             AuthorizationType: CUSTOM
             AuthorizerId: !Ref WebSocketAuthorizer
 
+
     ConnectInteg:
         Type: AWS::ApiGatewayV2::Integration
         Properties:
