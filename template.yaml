@@ -298,6 +298,7 @@ Resources:
             FunctionName: !Ref CustomVerificationEmailFunction
             Principal: cognito-idp.amazonaws.com
 
+
     SendMessageFunction:
         Type: AWS::Serverless::Function
         Properties:
