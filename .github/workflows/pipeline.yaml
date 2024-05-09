@@ -128,9 +128,9 @@ jobs:
                   use-installer: true
 
             - run: |
-                cd src
+                cd src/lambda
                 npm install
-                 npm install -g esbuild
+                npm install -g esbuild
 
 
             -  name: Build resources
