@@ -122,7 +122,7 @@ jobs:
         needs: [test]
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
             - uses: aws-actions/setup-sam@v2
               with:
                   use-installer: true
@@ -136,7 +136,7 @@ jobs:
             - run: sam build --template ${SAM_TEMPLATE} --use-container
 
             - name: Assume the testing pipeline user role
-              uses: aws-actions/configure-aws-credentials@v1-node16
+              uses: aws-actions/configure-aws-credentials@v4
               with:
                   aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
                   aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
