@@ -39,7 +39,7 @@ const connectHandler = async (event) => {
         };
         const connectedUser = await dynamo.send(new lib_dynamodb_1.QueryCommand(getUserParams));
         console.log({ connectedUser });
-        if (connectedUser.Items) {
+        if (connectedUser.Items && connectedUser.Items.length > 0) {
             console.log('User already connected and in the database');
             return {
                 statusCode: 200,
