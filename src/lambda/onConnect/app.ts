@@ -49,7 +49,7 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
             IndexName: 'cognitoid-index',
             KeyConditionExpression: 'cognitoid = :cognitoid',
             ExpressionAttributeValues: {
-                ':cognitoid': { S: cognitoId }, // Replace with your actual value
+                ':cognitoid': cognitoId, // Replace with your actual value
             },
         };
 
