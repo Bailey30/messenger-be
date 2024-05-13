@@ -56,7 +56,7 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
         const connectedUser = await dynamo.send(new QueryCommand(getUserParams));
         console.log({ connectedUser });
 
-        if (connectedUser) {
+        if (connectedUser.Items) {
             console.log('User already connected and in the database');
             return {
                 statusCode: 200,
