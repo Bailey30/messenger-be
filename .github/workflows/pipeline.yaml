@@ -44,6 +44,8 @@ jobs:
                   cd src
                   npm install
                   npm install -g esbuild
+                  cd lambda
+                  tsc
                   npm run test
 
     delete-feature:
@@ -92,6 +94,8 @@ jobs:
                 cd src
                 npm install
                 npm install -g esbuild
+                cd lambda
+                tsc
 
 
             - run: sam build --template ${SAM_TEMPLATE} --use-container
@@ -132,6 +136,7 @@ jobs:
                 cd src/lambda
                 npm install
                 npm install -g esbuild
+                tsc
 
             - run: sam build --template ${SAM_TEMPLATE} --use-container
 
@@ -244,7 +249,7 @@ jobs:
             - name: Assume the prod pipeline user role
               uses: aws-actions/configure-aws-credentials@v4
               with:
-                  aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
+                aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
                   aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
                   aws-region: ${{ env.PROD_REGION }}
                   role-to-assume: ${{ env.PROD_PIPELINE_EXECUTION_ROLE }}
