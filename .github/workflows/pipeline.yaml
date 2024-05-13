@@ -45,8 +45,6 @@ jobs:
                   npm install
                   npm install -g esbuild
                   cd lambda
-                  tsc
-                  cd ..
                   npm run test
 
     delete-feature:
