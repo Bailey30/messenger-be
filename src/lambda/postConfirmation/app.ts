@@ -6,6 +6,7 @@ import { DynamoDBDocumentClient, ScanCommand, PutCommand, GetCommand, DeleteComm
 
 const client = new DynamoDBClient({ region: 'eu-west-2' });
 const dynamo = DynamoDBDocumentClient.from(client);
+
 export const postConfirmationHandler = async (event: any, context: any, callback: any) => {
     console.log('EVENT', event);
     console.info('EVENT info\n' + JSON.stringify(event, null, 2));

@@ -36,6 +36,29 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
 
         const username = user?.UserAttributes.find((attr: { Name: string }) => attr.Name === 'name').Value;
 
+        // check if the user is already in the connections database
+        const getUserParams = {
+            TableName: process.env.CONNECTIONS_TABLE_NAME,
+            Key: {
+                cognitoid: cognitoId,
+            },
+        };
+
+        const connectedUser = await dynamo.send(new GetCommand(getUserParams));
+        console.log({ connectedUser });
+
+        if (connectedUser) {
+            console.log("User already connected and in the database")
+            return {
+                statusCode: 200,
+                body: JSON.stringify({
+                    message: 'User already connected to websocket',
+                }),
+            };
+        }
+
+
+        // put the user in the database if they are not already there
         const params = {
             TableName: process.env.CONNECTIONS_TABLE_NAME,
             Item: {
