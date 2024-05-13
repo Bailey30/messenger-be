@@ -31,14 +31,16 @@ const connectHandler = async (event) => {
         // check if the user is already in the connections database
         const getUserParams = {
             TableName: process.env.CONNECTIONS_TABLE_NAME,
-            Key: {
-                cognitoid: cognitoId,
+            IndexName: 'cognitoid-index',
+            KeyConditionExpression: 'cognitoid = :cognitoid',
+            ExpressionAttributeValues: {
+                ':cognitoid': { S: cognitoId }, // Replace with your actual value
             },
         };
-        const connectedUser = await dynamo.send(new lib_dynamodb_1.GetCommand(getUserParams));
+        const connectedUser = await dynamo.send(new lib_dynamodb_1.QueryCommand(getUserParams));
         console.log({ connectedUser });
         if (connectedUser) {
-            console.log("User already connected and in the database");
+            console.log('User already connected and in the database');
             return {
                 statusCode: 200,
                 body: JSON.stringify({

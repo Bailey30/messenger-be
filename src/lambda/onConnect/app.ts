@@ -5,7 +5,14 @@ import { websocketBroadcaster } from '/opt/nodejs/broadcastWebsocket';
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { DynamoDBClient, BatchExecuteStatementCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, ScanCommand, PutCommand, GetCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
+import {
+    DynamoDBDocumentClient,
+    ScanCommand,
+    PutCommand,
+    GetCommand,
+    DeleteCommand,
+    QueryCommand,
+} from '@aws-sdk/lib-dynamodb';
 import { CognitoIdentityProviderClient, GetUserCommand } from '@aws-sdk/client-cognito-identity-provider';
 import { PostToConnectionCommand, ApiGatewayManagementApiClient } from '@aws-sdk/client-apigatewaymanagementapi';
 
@@ -39,16 +46,18 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
         // check if the user is already in the connections database
         const getUserParams = {
             TableName: process.env.CONNECTIONS_TABLE_NAME,
-            Key: {
-                cognitoid: cognitoId,
+            IndexName: 'cognitoid-index',
+            KeyConditionExpression: 'cognitoid = :cognitoid',
+            ExpressionAttributeValues: {
+                ':cognitoid': { S: cognitoId }, // Replace with your actual value
             },
         };
 
-        const connectedUser = await dynamo.send(new GetCommand(getUserParams));
+        const connectedUser = await dynamo.send(new QueryCommand(getUserParams));
         console.log({ connectedUser });
 
         if (connectedUser) {
-            console.log("User already connected and in the database")
+            console.log('User already connected and in the database');
             return {
                 statusCode: 200,
                 body: JSON.stringify({
@@ -56,7 +65,6 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
                 }),
             };
         }
-
 
         // put the user in the database if they are not already there
         const params = {
