@@ -76,7 +76,7 @@ const connectHandler = async (event) => {
         };
         // updates onlineStatus in usersTable
         await dynamo.send(new client_dynamodb_1.UpdateItemCommand(usersTableParams));
-        // send websocket to everyone that uses has connected
+        // send websocket to everyone that has connected
         const getConnectionsParams = {
             TableName: process.env.CONNECTIONS_TABLE_NAME,
             ProjectionExpression: 'connectionId',
@@ -122,11 +122,11 @@ const connectHandler = async (event) => {
                 await broadCaster.broadcast('userConnected');
             }
             catch (error) {
-                console.log(error);
+                console.log('[error] error broading casting login:', error);
             }
         }
         catch (error) {
-            console.log(error);
+            console.log('[error] error broading casting login:', error);
         }
         return {
             statusCode: 200,

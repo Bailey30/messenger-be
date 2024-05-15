@@ -17,6 +17,8 @@
 //     // scan db for all connections
 //     const scanResponse = await dynamodbClient.send(new scanCommand(getConnectionsParams));
 
+import { error } from "console";
+
 //     if (!scanResponse.Items) return;
 //     for (const connection of scanResponse.Items) {
 //         const connectionId = connection.connectionId;
@@ -60,15 +62,17 @@ export class websocketBroadcaster {
         private deleteCommand: any,
         private username: string,
         private cognitoId: string,
-    ) {}
+    ) { }
 
     async broadcast(type: string): Promise<void> {
+        console.log("Calleding broadcast()")
         // send websocket to everyone that uses has connected
         const getConnectionsParams = {
             TableName: this.connectionsTableName,
             ProjectionExpression: 'connectionId',
         };
         // scan db for all connections
+        console.log("scanning db for all connection")
         const scanResponse = await this.dynamodbClient.send(new this.scanCommand(getConnectionsParams));
 
         if (!scanResponse.Items) return;
@@ -99,7 +103,7 @@ export class websocketBroadcaster {
                     );
                     throw e;
                 }
-                console.log({ e });
+                console.log("[error] error posting to connections", e);
             }
         }
     }

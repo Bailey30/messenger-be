@@ -99,7 +99,7 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
         // updates onlineStatus in usersTable
         await dynamo.send(new UpdateItemCommand(usersTableParams));
 
-        // send websocket to everyone that uses has connected
+        // send websocket to everyone that has connected
         const getConnectionsParams = {
             TableName: process.env.CONNECTIONS_TABLE_NAME,
             ProjectionExpression: 'connectionId',
@@ -158,10 +158,10 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
                 // await sendConnectedMessageToEveryone();
                 await broadCaster.broadcast('userConnected');
             } catch (error) {
-                console.log(error);
+                console.log('[error] error broading casting login:', error);
             }
         } catch (error) {
-            console.log(error);
+            console.log('[error] error broading casting login:', error);
         }
         return {
             statusCode: 200,

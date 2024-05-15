@@ -62,12 +62,14 @@ class websocketBroadcaster {
         this.cognitoId = cognitoId;
     }
     async broadcast(type) {
+        console.log("Calleding broadcast()");
         // send websocket to everyone that uses has connected
         const getConnectionsParams = {
             TableName: this.connectionsTableName,
             ProjectionExpression: 'connectionId',
         };
         // scan db for all connections
+        console.log("scanning db for all connection");
         const scanResponse = await this.dynamodbClient.send(new this.scanCommand(getConnectionsParams));
         if (!scanResponse.Items)
             return;
@@ -94,7 +96,7 @@ class websocketBroadcaster {
                     }));
                     throw e;
                 }
-                console.log({ e });
+                console.log("[error] error posting to connections", e);
             }
         }
     }
