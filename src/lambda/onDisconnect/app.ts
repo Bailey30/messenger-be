@@ -38,6 +38,7 @@ export const disconnectHandler = async (event: APIGatewayProxyEvent): Promise<AP
         };
 
         const connectedUser = await dynamo.send(new QueryCommand(getUserParams));
+        console.log('query result', connectedUser);
 
         console.log('connectedUser', connectedUser.Items ? connectedUser.Items[0] : 'no connected user found');
         const cognitoid = connectedUser.Items && connectedUser.Items[0].cognitoId;
