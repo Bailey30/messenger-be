@@ -4,7 +4,8 @@ exports.disconnectHandler = void 0;
 const client_dynamodb_1 = require("@aws-sdk/client-dynamodb");
 const lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
 const client_apigatewaymanagementapi_1 = require("@aws-sdk/client-apigatewaymanagementapi");
-const broadcastWebsocket_1 = require("../../utils/nodejs/broadcastWebsocket");
+//@ts-ignore
+const broadcastWebsocket_1 = require("/opt/nodejs/broadcastWebsocket");
 const client = new client_dynamodb_1.DynamoDBClient({ region: 'eu-west-2' });
 const dynamo = lib_dynamodb_1.DynamoDBDocumentClient.from(client);
 const disconnectHandler = async (event) => {

@@ -9,7 +9,9 @@ import {
     QueryCommand,
 } from '@aws-sdk/lib-dynamodb';
 import { ApiGatewayManagementApiClient, PostToConnectionCommand } from '@aws-sdk/client-apigatewaymanagementapi';
-import { websocketBroadcaster } from '../../utils/nodejs/broadcastWebsocket';
+
+//@ts-ignore
+import { websocketBroadcaster } from '/opt/nodejs/broadcastWebsocket';
 
 const client = new DynamoDBClient({ region: 'eu-west-2' });
 const dynamo = DynamoDBDocumentClient.from(client);
