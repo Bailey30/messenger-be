@@ -30,7 +30,7 @@ export const disconnectHandler = async (event: APIGatewayProxyEvent): Promise<AP
         // get the users cognitoId that can be broadcast to all active users
         const getUserParams = {
             TableName: process.env.CONNECTIONS_TABLE_NAME,
-            KeyConditionExpression: 'connectiontId = :connectionId',
+            KeyConditionExpression: 'connectionId = :connectionId',
             ExpressionAttributeValues: {
                 ':connectionId': event.requestContext.connectionId, // Replace with your actual value
             },
