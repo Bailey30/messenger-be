@@ -41,7 +41,7 @@ export const disconnectHandler = async (event: APIGatewayProxyEvent): Promise<AP
         console.log('query result', connectedUser);
 
         console.log('connectedUser', connectedUser.Items ? connectedUser.Items[0] : 'no connected user found');
-        const cognitoid = connectedUser.Items && connectedUser.Items[0].cognitoId;
+        const cognitoid = connectedUser.Items && connectedUser.Items[0].cognitoid;
 
         // maybe make cognito id as primary key again so we can use condition expression in onconnect
         // get cognitoid from connectionTable using connectionid

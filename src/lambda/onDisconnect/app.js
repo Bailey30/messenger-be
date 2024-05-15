@@ -30,7 +30,7 @@ const disconnectHandler = async (event) => {
         const connectedUser = await dynamo.send(new lib_dynamodb_1.QueryCommand(getUserParams));
         console.log('query result', connectedUser);
         console.log('connectedUser', connectedUser.Items ? connectedUser.Items[0] : 'no connected user found');
-        const cognitoid = connectedUser.Items && connectedUser.Items[0].cognitoId;
+        const cognitoid = connectedUser.Items && connectedUser.Items[0].cognitoid;
         // maybe make cognito id as primary key again so we can use condition expression in onconnect
         // get cognitoid from connectionTable using connectionid
         const connection = await dynamo.send(new lib_dynamodb_1.GetCommand(params));
