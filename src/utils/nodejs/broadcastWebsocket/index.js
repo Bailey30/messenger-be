@@ -78,19 +78,19 @@ class websocketBroadcaster {
             const connectionId = connection.connectionId;
             console.log({ connectionId });
             console.log('currentUserConnectionId', this.currentUserConnectionId);
-            if (connectionId === this.currentUserConnectionId)
-                return;
             const data = JSON.stringify({
                 type: type,
                 username: this.username,
                 cognitoId: this.cognitoId,
             });
             try {
-                const response = await this.APIGWClient.send(new this.postToConnectionCommand({
-                    ConnectionId: connectionId,
-                    Data: data,
-                }));
-                console.log({ response });
+                if (connectionId !== this.currentUserConnectionId) {
+                    const response = await this.APIGWClient.send(new this.postToConnectionCommand({
+                        ConnectionId: connectionId,
+                        Data: data,
+                    }));
+                    console.log({ response });
+                }
             }
             catch (e) {
                 if (e.statusCode === 410) {
