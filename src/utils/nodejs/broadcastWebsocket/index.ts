@@ -88,6 +88,7 @@ export class websocketBroadcaster {
             });
 
             try {
+                // post to all connections except the one of the user that triggered this
                 if (connectionId !== this.currentUserConnectionId) {
                     const response = await this.APIGWClient.send(
                         new this.postToConnectionCommand({

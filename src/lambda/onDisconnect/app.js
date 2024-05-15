@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.disconnectHandler = void 0;
 const client_dynamodb_1 = require("@aws-sdk/client-dynamodb");
 const lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
+const client_apigatewaymanagementapi_1 = require("@aws-sdk/client-apigatewaymanagementapi");
+const broadcastWebsocket_1 = require("../../utils/nodejs/broadcastWebsocket");
 const client = new client_dynamodb_1.DynamoDBClient({ region: 'eu-west-2' });
 const dynamo = lib_dynamodb_1.DynamoDBDocumentClient.from(client);
 const disconnectHandler = async (event) => {
@@ -15,11 +17,22 @@ const disconnectHandler = async (event) => {
         },
     };
     try {
+        // get the users cognitoId that can be broadcast to all active users
+        const getUserParams = {
+            TableName: process.env.CONNECTIONS_TABLE_NAME,
+            KeyConditionExpression: 'connectiontId = :connectionId',
+            ExpressionAttributeValues: {
+                ':connectionId': event.requestContext.connectionId, // Replace with your actual value
+            },
+        };
+        const connectedUser = await dynamo.send(new lib_dynamodb_1.QueryCommand(getUserParams));
+        console.log('connectedUser', connectedUser.Items ? connectedUser.Items[0] : 'no connected user found');
+        const cognitoid = connectedUser.Items && connectedUser.Items[0].cognitoId;
         // maybe make cognito id as primary key again so we can use condition expression in onconnect
         // get cognitoid from connectionTable using connectionid
         const connection = await dynamo.send(new lib_dynamodb_1.GetCommand(params));
         console.log('connection', connection);
-        const cognitoid = connection?.Item?.cognitoid;
+        // const cognitoid = connection?.Item?.cognitoid;
         console.log('cognitoid', cognitoid);
         // change online status of user to offline
         const usersTableParams = {
@@ -37,7 +50,13 @@ const disconnectHandler = async (event) => {
             ReturnValues: 'ALL_NEW',
         };
         await dynamo.send(new client_dynamodb_1.UpdateItemCommand(usersTableParams));
+        // delete connectionId from connections table
         await dynamo.send(new lib_dynamodb_1.DeleteCommand(params));
+        // broadcast disconnect event to active users
+        const endpoint = 'https://' + event.requestContext.domainName + '/' + event.requestContext.stage;
+        const APIGWClient = new client_apigatewaymanagementapi_1.ApiGatewayManagementApiClient({ region: 'eu-west-2', endpoint });
+        const broadCaster = new broadcastWebsocket_1.websocketBroadcaster(process.env.CONNECTIONS_TABLE_NAME, APIGWClient, dynamo, lib_dynamodb_1.ScanCommand, client_apigatewaymanagementapi_1.PostToConnectionCommand, lib_dynamodb_1.DeleteCommand, '', cognitoid, event.requestContext.connectionId ?? '');
+        broadCaster.broadcast('userDisconnected');
         return {
             statusCode: 200,
             body: JSON.stringify({

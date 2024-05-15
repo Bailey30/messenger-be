@@ -21,7 +21,6 @@ const dynamo = DynamoDBDocumentClient.from(client);
 
 const CognitoClient = new CognitoIdentityProviderClient({ region: 'eu-west-2' });
 export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    ///// testtst
     console.log('EVENT', event);
     console.info('EVENT\n' + JSON.stringify(event, null, 2));
     const accessToken = event.queryStringParameters?.token;
