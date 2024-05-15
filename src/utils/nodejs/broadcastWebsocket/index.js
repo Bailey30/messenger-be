@@ -51,7 +51,7 @@ exports.websocketBroadcaster = void 0;
 //     }
 // }
 class websocketBroadcaster {
-    constructor(connectionsTableName, APIGWClient, dynamodbClient, scanCommand, postToConnectionCommand, deleteCommand, username, cognitoId) {
+    constructor(connectionsTableName, APIGWClient, dynamodbClient, scanCommand, postToConnectionCommand, deleteCommand, username, cognitoId, currentUserConnectionId) {
         this.connectionsTableName = connectionsTableName;
         this.APIGWClient = APIGWClient;
         this.dynamodbClient = dynamodbClient;
@@ -60,21 +60,26 @@ class websocketBroadcaster {
         this.deleteCommand = deleteCommand;
         this.username = username;
         this.cognitoId = cognitoId;
+        this.currentUserConnectionId = currentUserConnectionId;
     }
     async broadcast(type) {
-        console.log("Calleding broadcast()");
+        console.log('Calleding broadcast()');
         // send websocket to everyone that uses has connected
         const getConnectionsParams = {
             TableName: this.connectionsTableName,
             ProjectionExpression: 'connectionId',
         };
         // scan db for all connections
-        console.log("scanning db for all connection");
+        console.log('scanning db for all connection');
         const scanResponse = await this.dynamodbClient.send(new this.scanCommand(getConnectionsParams));
         if (!scanResponse.Items)
             return;
         for (const connection of scanResponse.Items) {
             const connectionId = connection.connectionId;
+            console.log({ connectionId });
+            console.log('currentUserConnectionId', this.currentUserConnectionId);
+            if (connectionId === this.currentUserConnectionId)
+                return;
             const data = JSON.stringify({
                 type: type,
                 username: this.username,
@@ -96,7 +101,7 @@ class websocketBroadcaster {
                     }));
                     throw e;
                 }
-                console.log("[error] error posting to connections", e);
+                console.log('[error] error posting to connections', e);
             }
         }
     }

@@ -151,6 +151,7 @@ export const connectHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
                 DeleteCommand,
                 username,
                 cognitoId,
+                event.requestContext.connectionId,
             );
 
             try {
