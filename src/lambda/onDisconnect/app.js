@@ -23,7 +23,7 @@ const disconnectHandler = async (event) => {
             TableName: process.env.CONNECTIONS_TABLE_NAME,
             KeyConditionExpression: 'connectionId = :connectionId',
             ExpressionAttributeValues: {
-                ':connectionId': event.requestContext.connectionId, // Replace with your actual value
+                ':connectionId': { S: event.requestContext.connectionId }, // Replace with your actual value
             },
         };
         const connectedUser = await dynamo.send(new lib_dynamodb_1.QueryCommand(getUserParams));

@@ -32,11 +32,12 @@ export const disconnectHandler = async (event: APIGatewayProxyEvent): Promise<AP
             TableName: process.env.CONNECTIONS_TABLE_NAME,
             KeyConditionExpression: 'connectionId = :connectionId',
             ExpressionAttributeValues: {
-                ':connectionId': event.requestContext.connectionId, // Replace with your actual value
+                ':connectionId': { S: event.requestContext.connectionId }, // Replace with your actual value
             },
         };
 
         const connectedUser = await dynamo.send(new QueryCommand(getUserParams));
+
         console.log('connectedUser', connectedUser.Items ? connectedUser.Items[0] : 'no connected user found');
         const cognitoid = connectedUser.Items && connectedUser.Items[0].cognitoId;
 
