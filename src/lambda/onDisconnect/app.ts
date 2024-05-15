@@ -32,8 +32,9 @@ export const disconnectHandler = async (event: APIGatewayProxyEvent): Promise<AP
             TableName: process.env.CONNECTIONS_TABLE_NAME,
             KeyConditionExpression: 'connectionId = :connectionId',
             ExpressionAttributeValues: {
-                ':connectionId': { S: event.requestContext.connectionId }, // Replace with your actual value
+                ':connectionId': event.requestContext.connectionId,
             },
+            ConsistentRead: true,
         };
 
         const connectedUser = await dynamo.send(new QueryCommand(getUserParams));

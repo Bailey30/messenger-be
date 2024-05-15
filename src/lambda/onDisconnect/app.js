@@ -23,8 +23,9 @@ const disconnectHandler = async (event) => {
             TableName: process.env.CONNECTIONS_TABLE_NAME,
             KeyConditionExpression: 'connectionId = :connectionId',
             ExpressionAttributeValues: {
-                ':connectionId': { S: event.requestContext.connectionId }, // Replace with your actual value
+                ':connectionId': event.requestContext.connectionId,
             },
+            ConsistentRead: true,
         };
         const connectedUser = await dynamo.send(new lib_dynamodb_1.QueryCommand(getUserParams));
         console.log('connectedUser', connectedUser.Items ? connectedUser.Items[0] : 'no connected user found');
