@@ -232,6 +232,8 @@ Resources:
             CodeUri: src/lambda/onDisconnect
             Handler: app.disconnectHandler
             Runtime: nodejs18.x
+            Layers:
+                - !Ref UtilsLayer
             Environment:
                 Variables:
                     CONNECTIONS_TABLE_NAME: !Ref ConnectionsTable
