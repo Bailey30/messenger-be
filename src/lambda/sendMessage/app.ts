@@ -85,7 +85,7 @@ export const sendMessageHandler = async (event: any) => {
 
         const APIGWClient = new ApiGatewayManagementApiClient({
             region: 'eu-west-2',
-            endpoint: event.requestContext.domainName + '/' + event.requestContext.stage,
+            endpoint: 'https://' + event.requestContext.domainName + '/' + event.requestContext.stage,
         });
 
         const messageData = {

@@ -74,7 +74,7 @@ const sendMessageHandler = async (event) => {
         await addMessageToDB(conversationId, createdAt, senderId, receiverId, content);
         const APIGWClient = new client_apigatewaymanagementapi_1.ApiGatewayManagementApiClient({
             region: 'eu-west-2',
-            endpoint: event.requestContext.domainName + '/' + event.requestContext.stage,
+            endpoint: 'https://' + event.requestContext.domainName + '/' + event.requestContext.stage,
         });
         const messageData = {
             type: 'messageReceived',

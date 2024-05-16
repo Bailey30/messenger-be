@@ -82,35 +82,6 @@ const connectHandler = async (event) => {
         };
         // scan db for all connections
         const scanResponse = await dynamo.send(new lib_dynamodb_1.ScanCommand(getConnectionsParams));
-        // const apigwManagementApi = new AWS.ApiGatewayManagementApi({
-        //     apiVersion: '2018-11-29',
-        //     endpoint: event.requestContext.domainName + '/' + event.requestContext.stage,
-        // });
-        // const sendConnectedMessageToEveryone = scanResponse?.Items?.map(async ({ connectionId }) => {
-        //     console.log({ connectionId });
-        //     const data = JSON.stringify({
-        //         type: 'userConnected',
-        //         username,
-        //         cognitoId,
-        //     });
-        //     try {
-        //         const response = await APIGWClient.send(
-        //             new PostToConnectionCommand({
-        //                 ConnectionId: connectionId,
-        //                 Data: data,
-        //             }),
-        //         );
-        //         console.log({ response });
-        //     } catch (e: any) {
-        //         if (e.statusCode === 410) {
-        //             console.log(`Found stale connection, deleting ${connectionId}`);
-        //             await dynamo.send(
-        //                 new DeleteCommand({ TableName: process.env.CONNECTIONS_TABLE_NAME, Key: { connectionId } }),
-        //             );
-        //             throw e;
-        //         }
-        //     }
-        // }) as Promise<void>[];
         try {
             const endpoint = 'https://' + event.requestContext.domainName + '/' + event.requestContext.stage;
             const APIGWClient = new client_apigatewaymanagementapi_1.ApiGatewayManagementApiClient({ region: 'eu-west-2', endpoint });
