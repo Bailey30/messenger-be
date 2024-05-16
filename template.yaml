@@ -379,13 +379,16 @@ Resources:
             CodeUri: src/lambda/getConversation
             Handler: app.getConversation
             Runtime: nodejs18.x
-            Role: !GetAtt FunctionRole.Arn
+            # Role: !GetAtt FunctionRole.Arn
             Environment:
                 Variables:
                   CONVERSATIONS_TABLE_NAME: !Ref ConversationsTable
+                  MESSAGES_TABLE_NAME: !Ref MessagesTable
             Policies:
                 - DynamoDBCrudPolicy:
                   TableName: !Ref ConversationTable
+                - DynamoDBCrudPolicy:
+                  TableName: !Ref MessagesTable
     GetConversationPermission:
         Type: AWS::Lambda::Permission
         DependsOn: 

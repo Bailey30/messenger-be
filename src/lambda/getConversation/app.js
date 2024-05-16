@@ -6,6 +6,7 @@ const lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
 const client = new client_dynamodb_1.DynamoDBClient({ region: 'eu-west-2' });
 const dynamo = lib_dynamodb_1.DynamoDBDocumentClient.from(client);
 const uuid_1 = require("uuid");
+// get an existing conversation between two people and return the conversationId
 const scanForConversation = async (userCognitoId, selectedUserCognitoId) => {
     const scanParams = {
         TableName: process.env.CONVERSATIONS_TABLE_NAME,
@@ -30,6 +31,7 @@ const scanForConversation = async (userCognitoId, selectedUserCognitoId) => {
         return null;
     }
 };
+// create a conversation if one doesn't exist
 const createConversation = async (userCognitoId, selectedUserCognitoId, newConversationId) => {
     const putParams = {
         TableName: process.env.CONVERSATIONS_TABLE_NAME,
@@ -39,6 +41,19 @@ const createConversation = async (userCognitoId, selectedUserCognitoId, newConve
         },
     };
     await dynamo.send(new lib_dynamodb_1.PutCommand(putParams));
+};
+// get messages from an existing conversation
+const getMessages = async (conversationId) => {
+    const messages = await dynamo.send(new lib_dynamodb_1.QueryCommand({
+        TableName: process.env.MESSAGES_TABLE_NAME,
+        KeyConditionExpression: 'conversationId = :id',
+        ExpressionAttributeValues: {
+            ':id': conversationId,
+        },
+    }));
+    console.log({ messages });
+    console.log('messages.Items', messages.Items);
+    return messages.Items;
 };
 // lambda handler
 const getConversation = async (event, context, callback) => {
@@ -50,11 +65,15 @@ const getConversation = async (event, context, callback) => {
         let conversationId;
         // take cognitoid of both users and search database for conversation that has those ids
         const existingConversation = await scanForConversation(userCognitoId, selectedUserCognitoId);
-        // if conversation doesnt exists, create new conversation
+        let messages = [];
         if (existingConversation) {
+            // if conversation exists, get the conversationId and use it to get any messages from that conversation
+            console.log('Conversation exists:', existingConversation);
             conversationId = existingConversation;
+            messages = await getMessages(existingConversation);
         }
         else {
+            // if conversation doesnt exists, create new conversation
             const newConversationId = (0, uuid_1.v4)();
             await createConversation(userCognitoId, selectedUserCognitoId, newConversationId);
             conversationId = newConversationId;
@@ -62,7 +81,7 @@ const getConversation = async (event, context, callback) => {
         }
         callback(null, {
             statusCode: 200,
-            body: JSON.stringify({ conversationId }),
+            body: JSON.stringify({ conversationId, messages }),
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
