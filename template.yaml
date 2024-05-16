@@ -522,6 +522,7 @@ Resources:
                                 - dynamodb:PutItem
                                 - dynamodb:GetItem
                                 - dynamodb:Scan
+                                - dynamodb:Query
                                 - logs:CreateLogGroup
                                 - logs:CreateLogStream
                                 - logs:PutLogEvents

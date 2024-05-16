@@ -76,6 +76,7 @@ export const sendMessageHandler = async (event: any) => {
         // const senderId = data.senderId;
         // const receiverId = data.receiverId;
 
+        // user the cognitoId of the person to receieve the message to get their current connectionId
         const connectionId = await getConnectionId(receiverId);
         await addMessageToDB(conversationId, createdAt, senderId, receiverId, content);
 
