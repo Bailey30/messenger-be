@@ -1,5 +1,5 @@
-import { AttributeValue, DynamoDBClient, QueryCommand, ScanCommand } from '@aws-sdk/client-dynamodb';
-import { DeleteCommand, DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
+import { AttributeValue, DynamoDBClient, ScanCommand } from '@aws-sdk/client-dynamodb';
+import { DeleteCommand, DynamoDBDocumentClient, PutCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 
 const client = new DynamoDBClient({ region: 'eu-west-2' });
 const dynamo = DynamoDBDocumentClient.from(client);
@@ -14,16 +14,16 @@ const getConnectionId = async (cognitoId: string): Promise<string | null> => {
         const params = {
             TableName: process.env.CONNECTIONS_TABLE_NAME,
             IndexName: 'cognitoid-index', // Name of the global secondary index
-            KeyConditionExpression: 'cognitoid = :cognitoId',
+            KeyConditionExpression: 'cognitoid = :cognitoid',
             ExpressionAttributeValues: {
-                ':cognitoId': { S: cognitoId }, // Convert to DynamoDB AttributeValue format
+                ':cognitoid': cognitoId, // Convert to DynamoDB AttributeValue format
             },
         };
         const scanResponse = await dynamo.send(new QueryCommand(params));
         console.log({ scanResponse });
         // Check if any items were found
-        if (scanResponse.Items && scanResponse.Items.length > 0 && scanResponse.Items[0].connectionId.S) {
-            const connectionId = scanResponse.Items[0].connectionId.S;
+        if (scanResponse.Items && scanResponse.Items.length > 0 && scanResponse.Items[0].connectionId) {
+            const connectionId = scanResponse.Items[0].connectionId;
             console.log('Connection ID:', connectionId);
             return connectionId;
         } else {
@@ -78,6 +78,9 @@ export const sendMessageHandler = async (event: any) => {
 
         // user the cognitoId of the person to receieve the message to get their current connectionId
         const connectionId = await getConnectionId(receiverId);
+
+        console.log('retrieved connectionId', connectionId);
+
         await addMessageToDB(conversationId, createdAt, senderId, receiverId, content);
 
         const APIGWClient = new ApiGatewayManagementApiClient({
@@ -95,6 +98,7 @@ export const sendMessageHandler = async (event: any) => {
         };
 
         if (connectionId) {
+            console.log('connectionId && trying to post to connection');
             try {
                 await APIGWClient.send(
                     new PostToConnectionCommand({ ConnectionId: connectionId, Data: JSON.stringify(messageData) }),

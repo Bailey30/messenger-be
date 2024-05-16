@@ -13,16 +13,16 @@ const getConnectionId = async (cognitoId) => {
         const params = {
             TableName: process.env.CONNECTIONS_TABLE_NAME,
             IndexName: 'cognitoid-index',
-            KeyConditionExpression: 'cognitoid = :cognitoId',
+            KeyConditionExpression: 'cognitoid = :cognitoid',
             ExpressionAttributeValues: {
-                ':cognitoId': { S: cognitoId }, // Convert to DynamoDB AttributeValue format
+                ':cognitoid': cognitoId, // Convert to DynamoDB AttributeValue format
             },
         };
-        const scanResponse = await dynamo.send(new client_dynamodb_1.QueryCommand(params));
+        const scanResponse = await dynamo.send(new lib_dynamodb_1.QueryCommand(params));
         console.log({ scanResponse });
         // Check if any items were found
-        if (scanResponse.Items && scanResponse.Items.length > 0 && scanResponse.Items[0].connectionId.S) {
-            const connectionId = scanResponse.Items[0].connectionId.S;
+        if (scanResponse.Items && scanResponse.Items.length > 0 && scanResponse.Items[0].connectionId) {
+            const connectionId = scanResponse.Items[0].connectionId;
             console.log('Connection ID:', connectionId);
             return connectionId;
         }
@@ -68,7 +68,9 @@ const sendMessageHandler = async (event) => {
         // const createdAt = data.createdAt;
         // const senderId = data.senderId;
         // const receiverId = data.receiverId;
+        // user the cognitoId of the person to receieve the message to get their current connectionId
         const connectionId = await getConnectionId(receiverId);
+        console.log('retrieved connectionId', connectionId);
         await addMessageToDB(conversationId, createdAt, senderId, receiverId, content);
         const APIGWClient = new client_apigatewaymanagementapi_1.ApiGatewayManagementApiClient({
             region: 'eu-west-2',
@@ -83,6 +85,7 @@ const sendMessageHandler = async (event) => {
             receiverId,
         };
         if (connectionId) {
+            console.log('connectionId && trying to post to connection');
             try {
                 await APIGWClient.send(new client_apigatewaymanagementapi_1.PostToConnectionCommand({ ConnectionId: connectionId, Data: JSON.stringify(messageData) }));
                 console.log('message sent to:', connectionId, messageData);
