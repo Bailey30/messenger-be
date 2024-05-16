@@ -309,7 +309,7 @@ Resources:
             CodeUri: src/lambda/sendMessage
             Handler: app.sendMessageHandler
             Runtime: nodejs18.x
-            Role: !GetAtt FunctionRole.Arn
+            # Role: !GetAtt FunctionRole.Arn
             Environment:
                 Variables:
                     CONNECTIONS_TABLE_NAME: !Ref ConnectionsTable
@@ -318,7 +318,7 @@ Resources:
                 - DynamoDBCrudPolicy:
                       TableName: !Ref ConnectionsTable
                 - DynamoDBCrudPolicy:
-                      TableName: !Ref MessagesTab
+                      TableName: !Ref MessagesTable
                 - Statement:
                     - Effect: Allow
                       Action:
