@@ -386,9 +386,9 @@ Resources:
                   MESSAGES_TABLE_NAME: !Ref MessagesTable
             Policies:
                 - DynamoDBCrudPolicy:
-                  TableName: !Ref ConversationTable
+                    TableName: !Ref ConversationsTable
                 - DynamoDBCrudPolicy:
-                  TableName: !Ref MessagesTable
+                    TableName: !Ref MessagesTable
     GetConversationPermission:
         Type: AWS::Lambda::Permission
         DependsOn: 
