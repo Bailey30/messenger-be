@@ -170,6 +170,25 @@ Resources:
             IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetConversationFunction.Arn}/invocations
             PayloadFormatVersion: "1.0"
 
+    ConversationRoute:
+        Type: AWS::ApiGatewayV2::Route
+        Properties:
+            ApiId: !Ref RestApi
+            RouteKey: POST /conversations
+            AuthorizationType: NONE
+            OperationName: ConversationsRoute
+            Target: !Join 
+                - "/"
+                - - "integrations"
+                  - !Ref ConversationsInteg
+    ConversationsInteg:
+        Type: AWS::ApiGatewayV2::Integration
+        Properties:
+            ApiId: !Ref RestApi
+            IntegrationType: AWS_PROXY
+            IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConversationsFunction.Arn}/invocations
+            PayloadFormatVersion: "1.0"
+
     # NewMessageRoute:
     #     Type: AWS::ApiGatewayV2::Route
     #     Properties:
@@ -397,7 +416,32 @@ Resources:
             Action: lambda:InvokeFunction
             FunctionName: !Ref GetConversationFunction
             Principal: apigateway.amazonaws.com
-    
+
+    ConversationsFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            CodeUri: src/lambda/conversations
+            Handler: app.conversations
+            Runtime: nodejs18.x
+            # Role: !GetAtt FunctionRole.Arn
+            Environment:
+                Variables:
+                  CONVERSATIONS_TABLE_NAME: !Ref ConversationsTable
+                  MESSAGES_TABLE_NAME: !Ref MessagesTable
+            Policies:
+                - DynamoDBCrudPolicy:
+                    TableName: !Ref ConversationsTable
+                - DynamoDBCrudPolicy:
+                    TableName: !Ref MessagesTable
+    ConversationsPermission:
+        Type: AWS::Lambda::Permission
+        DependsOn: 
+            - RestApi
+        Properties:
+            Action: lambda:InvokeFunction
+            FunctionName: !Ref ConversationsFunction
+            Principal: apigateway.amazonaws.com 
+
     # NewMessageFunction:
     #     Type: AWS::Serverless::Function
     #     Properties:
@@ -579,6 +623,9 @@ Outputs:
     GetConversationEndPoint:
         Description: Get Conversation API endpoint
         Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/dev/getConversation"
+    ConversationsEndPoint:
+        Description: Conversations API endpoint - gets the first message from every conversation
+        Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/dev/conversations"
     OnConnectFunctionArn:
         Description: "OnConnect function ARN"
         Value: !GetAtt OnConnectFunction.Arn
