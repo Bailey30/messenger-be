@@ -1,8 +1,13 @@
 import { AttributeValue, DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { ScanCommand, DeleteCommand, DynamoDBDocumentClient, PutCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 
+import { Context, APIGatewayProxyCallback, APIGatewayEvent } from 'aws-lambda';
+
 const client = new DynamoDBClient({ region: 'eu-west-2' });
 const dynamo = DynamoDBDocumentClient.from(client);
+
+import { Logger } from '@aws-lambda-powertools/logger';
+const logger = new Logger();
 
 async function getConversationIds(cognitoId: string) {
     const scanParams = {
@@ -59,9 +64,26 @@ async function getMessages(conversations: Record<string, any>[]) {
     }
 }
 
-export const conversations = async (event: any, callback: any) => {
+export const conversations = async (event: APIGatewayEvent, context: Context, callback: APIGatewayProxyCallback) => {
     try {
         console.log('[Event]', event);
+
+        logger.info(`[Event]: ${event}`)
+
+        if (!event.body) {
+            return callback(null, {
+                statusCode: 500,
+                body: JSON.stringify({ error: 'Request body required' }),
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
+                    'Access-Control-Allow-Headers': 'Content-Type',
+                },
+            });
+        }
+
+        console.log('[Context]', JSON.stringify(context));
+
         const body = JSON.parse(event.body);
 
         const userCognitoId = body.userCognitoId;
