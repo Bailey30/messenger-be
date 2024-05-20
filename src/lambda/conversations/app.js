@@ -33,7 +33,7 @@ async function getMessages(conversations) {
         for (const conversation of conversations) {
             // Create parameters for the QueryCommand
             const params = {
-                TableName: 'YourTableName',
+                TableName: process.env.MESSAGES_TABLE_NAME,
                 KeyConditionExpression: 'conversationId = :conversationId',
                 ExpressionAttributeValues: {
                     ':conversationId': conversation.conversationId,
