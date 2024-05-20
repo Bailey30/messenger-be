@@ -5,12 +5,14 @@ const client_dynamodb_1 = require("@aws-sdk/client-dynamodb");
 const lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
 const client = new client_dynamodb_1.DynamoDBClient({ region: 'eu-west-2' });
 const dynamo = lib_dynamodb_1.DynamoDBDocumentClient.from(client);
+const logger_1 = require("@aws-lambda-powertools/logger");
+const logger = new logger_1.Logger();
 async function getConversationIds(cognitoId) {
     const scanParams = {
         TableName: process.env.CONVERSATIONS_TABLE_NAME,
         FilterExpression: 'contains(participants, :cognitoId) ',
         ExpressionAttributeValues: {
-            ':userId': cognitoId,
+            ':cognitoId': cognitoId,
         },
         ProjectionExpression: 'conversationId',
     };
@@ -55,9 +57,22 @@ async function getMessages(conversations) {
         throw new Error('Could not retrieve messages');
     }
 }
-const conversations = async (event, callback) => {
+const conversations = async (event, context, callback) => {
     try {
         console.log('[Event]', event);
+        logger.info(`[Event]: ${event}`);
+        if (!event.body) {
+            return callback(null, {
+                statusCode: 500,
+                body: JSON.stringify({ error: 'Request body required' }),
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
+                    'Access-Control-Allow-Headers': 'Content-Type',
+                },
+            });
+        }
+        console.log('[Context]', JSON.stringify(context));
         const body = JSON.parse(event.body);
         const userCognitoId = body.userCognitoId;
         const conversationIds = await getConversationIds(userCognitoId);

@@ -14,7 +14,7 @@ async function getConversationIds(cognitoId: string) {
         TableName: process.env.CONVERSATIONS_TABLE_NAME,
         FilterExpression: 'contains(participants, :cognitoId) ',
         ExpressionAttributeValues: {
-            ':userId': cognitoId,
+            ':cognitoId': cognitoId,
         },
         ProjectionExpression: 'conversationId',
     };
@@ -68,7 +68,7 @@ export const conversations = async (event: APIGatewayEvent, context: Context, ca
     try {
         console.log('[Event]', event);
 
-        logger.info(`[Event]: ${event}`)
+        logger.info(`[Event]: ${event}`);
 
         if (!event.body) {
             return callback(null, {
