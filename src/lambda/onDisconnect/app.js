@@ -59,7 +59,7 @@ const disconnectHandler = async (event) => {
         const endpoint = 'https://' + event.requestContext.domainName + '/' + event.requestContext.stage;
         const APIGWClient = new client_apigatewaymanagementapi_1.ApiGatewayManagementApiClient({ region: 'eu-west-2', endpoint });
         const broadCaster = new broadcastWebsocket_1.websocketBroadcaster(process.env.CONNECTIONS_TABLE_NAME, APIGWClient, dynamo, lib_dynamodb_1.ScanCommand, client_apigatewaymanagementapi_1.PostToConnectionCommand, lib_dynamodb_1.DeleteCommand, '', cognitoid, event.requestContext.connectionId ?? '');
-        broadCaster.broadcast('userDisconnected');
+        await broadCaster.broadcast('userDisconnected');
         return {
             statusCode: 200,
             body: JSON.stringify({

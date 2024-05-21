@@ -63,7 +63,7 @@ class websocketBroadcaster {
         this.currentUserConnectionId = currentUserConnectionId;
     }
     async broadcast(type) {
-        console.log('Calleding broadcast()');
+        console.log('Calling broadcast()');
         // send websocket to everyone that uses has connected
         const getConnectionsParams = {
             TableName: this.connectionsTableName,
@@ -72,8 +72,11 @@ class websocketBroadcaster {
         // scan db for all connections
         console.log('scanning db for all connection');
         const scanResponse = await this.dynamodbClient.send(new this.scanCommand(getConnectionsParams));
-        if (!scanResponse.Items)
+        if (!scanResponse.Items) {
+            console.log("Nothing returned from scanning connections table. Returning from function");
             return;
+        }
+        ;
         for (const connection of scanResponse.Items) {
             const connectionId = connection.connectionId;
             console.log({ connectionId });

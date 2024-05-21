@@ -87,7 +87,7 @@ export const disconnectHandler = async (event: APIGatewayProxyEvent): Promise<AP
             event.requestContext.connectionId ?? '',
         );
 
-        broadCaster.broadcast('userDisconnected');
+        await broadCaster.broadcast('userDisconnected');
 
         return {
             statusCode: 200,
